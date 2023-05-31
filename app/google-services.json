@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "618387958013",
+    "project_id": "huy-s-recipe-app",
+    "storage_bucket": "huy-s-recipe-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:618387958013:android:b0b1251ad278b21a007694",
+        "android_client_info": {
+          "package_name": "ntu.nthuy.recipeapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8uVLTXZqRzvU6QnZ5c-RzW4TtkbPTqB4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
