@@ -6,40 +6,77 @@ public class RecipeDetailsResponse {
     public int id;
     public String title;
     public String image;
-    public String imageType;
-    public int servings;
-    public int readyInMinutes;
-    public String license;
     public String sourceName;
-    public String sourceUrl;
-    public String spoonacularSourceUrl;
-    public int aggregateLikes;
-    public double healthScore;
-    public double spoonacularScore;
-    public double pricePerServing;
-    public ArrayList<Object> analyzedInstructions;
-    public boolean cheap;
-    public String creditsText;
-    public ArrayList<Object> cuisines;
-    public boolean dairyFree;
-    public ArrayList<Object> diets;
-    public String gaps;
-    public boolean glutenFree;
-    public String instructions;
-    public boolean ketogenic;
-    public boolean lowFodmap;
-    public ArrayList<Object> occasions;
-    public boolean sustainable;
-    public boolean vegan;
-    public boolean vegetarian;
-    public boolean veryHealthy;
-    public boolean veryPopular;
-    public boolean whole30;
-    public int weightWatcherSmartPoints;
-    public ArrayList<String> dishTypes;
     public ArrayList<ExtendedIngredient> extendedIngredients;
     public String summary;
-    public WinePairing winePairing;
     public String note;
 
+    public RecipeDetailsResponse() {
+    }
+
+    public RecipeDetailsResponse(int id, String title, String image, String sourceName, ArrayList<ExtendedIngredient> extendedIngredients, String summary, String note) {
+        this.id = id;
+        this.title = title;
+        this.image = image;
+        this.sourceName = sourceName;
+        this.extendedIngredients = extendedIngredients;
+        this.summary = summary;
+        this.note = note;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
+    }
+
+    public ArrayList<ExtendedIngredient> getExtendedIngredients() {
+        return extendedIngredients;
+    }
+
+    public void setExtendedIngredients(ArrayList<ExtendedIngredient> extendedIngredients) {
+        this.extendedIngredients = extendedIngredients;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
 }

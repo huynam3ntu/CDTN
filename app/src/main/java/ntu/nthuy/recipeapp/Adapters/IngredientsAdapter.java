@@ -12,9 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
-import java.util.List;
+import java.util.ArrayList;
 
 import ntu.nthuy.recipeapp.Model.ExtendedIngredient;
 import ntu.nthuy.recipeapp.R;
@@ -22,13 +20,21 @@ import ntu.nthuy.recipeapp.R;
 public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsViewHolder>{
 
     Context context;
-    List<ExtendedIngredient> list;
+    ArrayList<ExtendedIngredient> list;
 
-    public IngredientsAdapter(Context context, List<ExtendedIngredient> list) {
+    public IngredientsAdapter(Context context, ArrayList<ExtendedIngredient> list) {
         this.context = context;
         this.list = list;
     }
 
+    public ArrayList<ExtendedIngredient> getIngredient() {
+        return list;
+    }
+    public void addIngredient(ExtendedIngredient ingredient) {
+
+        list.add(ingredient);
+        notifyItemInserted(list.size() - 1);
+    }
     @NonNull
     @Override
     public IngredientsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

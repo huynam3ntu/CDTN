@@ -6,7 +6,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import ntu.nthuy.recipeapp.Model.FavoriteUtils;
+import ntu.nthuy.recipeapp.Model.RecipeDetailsResponse;
 
 public class FirebaseDatabaseHelper {
     private   DatabaseReference mDatabase;
@@ -20,11 +20,14 @@ public class FirebaseDatabaseHelper {
         return mDatabase;
     }
 
-    public void addRecipe(FavoriteUtils recipe) {
+    public List<Integer> getListId() {
+        return listId;
+    }
+
+    public void addRecipe(RecipeDetailsResponse recipe) {
         DatabaseReference myRef = mDatabase.child(String.valueOf(recipe.id));
         listId.add(recipe.id);
-        FavoriteUtils fav = new FavoriteUtils(recipe.id, recipe.title, recipe.image, recipe.summary, "");
-        myRef.setValue(fav);
+        myRef.setValue(recipe);
     }
 
     public void deleteRecipe(int recipeId) {

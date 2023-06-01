@@ -16,15 +16,15 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import ntu.nthuy.recipeapp.Listeners.RecipeClickedListener;
-import ntu.nthuy.recipeapp.Model.FavoriteUtils;
+import ntu.nthuy.recipeapp.Model.RecipeDetailsResponse;
 import ntu.nthuy.recipeapp.R;
 
 public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesViewHolder>{
-    private final List<FavoriteUtils> listFav;
+    private final List<RecipeDetailsResponse> listFav;
     Context context;
     RecipeClickedListener clickedListener;
 
-    public FavoritesAdapter(List<FavoriteUtils> listFav, Context context, RecipeClickedListener clickedListener) {
+    public FavoritesAdapter(List<RecipeDetailsResponse> listFav, Context context, RecipeClickedListener clickedListener) {
         this.listFav = listFav;
         this.context = context;
         this.clickedListener = clickedListener;
@@ -38,11 +38,12 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull FavoritesViewHolder holder, int position) {
-        FavoriteUtils favoriteUtils = listFav.get(position);
-        if(favoriteUtils != null) {
+        RecipeDetailsResponse fav = listFav.get(position);
+        if(fav != null) {
             holder.item_favorite_number.setText(String.valueOf(position + 1));
             Picasso.get().load(listFav.get(position).image).into(holder.item_favorite_image);
             holder.item_favorite_name.setText(listFav.get(position).title);
+            holder.list_favorites.setOnClickListener(v -> clickedListener.onRecipeClicked(String.valueOf(listFav.get(holder.getAdapterPosition()).id)));
         }
     }
 

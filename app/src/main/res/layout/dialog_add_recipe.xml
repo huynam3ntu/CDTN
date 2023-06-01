@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <EditText
+        android:id="@+id/edt_dialogFav_title"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="Title"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:textStyle="normal"
+        android:inputType="text"
+        android:autofillHints="name"/>
+
+    <EditText
+        android:id="@+id/edt_dialogFav_image"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="Image URL"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:textStyle="normal"
+        android:inputType="text"
+        android:autofillHints="url"/>
+
+    <EditText
+        android:id="@+id/edt_dialogFav_source"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="Source Name"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:textStyle="normal"
+        android:inputType="text"
+        android:autofillHints="source"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingredients"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyler_ingredients_fav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/button_add_ingredient"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Ingredient" />
+
+    <EditText
+        android:id="@+id/edt_dialogFav_summary"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="Summary"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:textStyle="normal"
+        android:autofillHints="summary"
+        android:inputType="text"/>
+
+</LinearLayout>

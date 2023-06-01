@@ -26,7 +26,6 @@ import ntu.nthuy.recipeapp.Listeners.InstructionsListener;
 import ntu.nthuy.recipeapp.Listeners.RecipeClickedListener;
 import ntu.nthuy.recipeapp.Listeners.RecipeDetailsListener;
 import ntu.nthuy.recipeapp.Listeners.SimilarRecipesListener;
-import ntu.nthuy.recipeapp.Model.FavoriteUtils;
 import ntu.nthuy.recipeapp.Model.InstructionsReponse;
 import ntu.nthuy.recipeapp.Model.RecipeDetailsResponse;
 import ntu.nthuy.recipeapp.Model.SimilarRecipesResponse;
@@ -57,7 +56,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
         manager = new RequestManager(this);
 
         manager.getRecipeDetails(recipeDetailsListener, id);
-
         manager.getSimilarRecipes(similarRecipesListener, id);
         manager.getInstructions(instructionsListener, id);
 
@@ -130,15 +128,14 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
                     myData.deleteRecipe(response.id);
                     //Thông báo
-                    Toast.makeText(RecipeDetailActivity.this, "Removed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RecipeDetailActivity.this, "Removed from favorites", Toast.LENGTH_SHORT).show();
                 }else {
                     // Món ăn chưa được thêm vào danh sách yêu thích
                     favoriteButton.setImageResource(R.drawable.ic_favorite);
                     // Nếu món ăn chưa có trong danh sách yêu thích, thêm nó vào danh sách
-                    FavoriteUtils fav = new FavoriteUtils(response.id, response.title, response.image, response.summary, "");
-                    myData.addRecipe(fav);
+                    myData.addRecipe(response);
                     //Thông báo
-                    Toast.makeText(RecipeDetailActivity.this, "Added", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RecipeDetailActivity.this, "Added to favorites", Toast.LENGTH_SHORT).show();
                 }
             });
         }

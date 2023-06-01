@@ -76,8 +76,6 @@ public class MainActivity extends AppCompatActivity {
         spinner.setAdapter(arrayAdapter);
         spinner.setOnItemSelectedListener(spinnerSelectedListenner);
         manager = new RequestManager(this);
-//        manager.getRandomRecipes(randomRecipeResponseListener);
-//        dialog.show();
     }
     private final RandomRecipeResponseListener randomRecipeResponseListener = new RandomRecipeResponseListener() {
         @Override
@@ -111,12 +109,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private final  RecipeClickedListener recipeClickedListener = new RecipeClickedListener() {
-        @Override
-        public void onRecipeClicked(String id) {
-
-            startActivity(new Intent(MainActivity.this, RecipeDetailActivity.class)
-                    .putExtra("id", id));
-        }
-    };
+    private final  RecipeClickedListener recipeClickedListener = id -> startActivity(new Intent(MainActivity.this, RecipeDetailActivity.class)
+            .putExtra("id", id));
 }
