@@ -7,16 +7,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
@@ -31,6 +26,7 @@ import ntu.nthuy.recipeapp.Listeners.InstructionsListener;
 import ntu.nthuy.recipeapp.Listeners.RecipeClickedListener;
 import ntu.nthuy.recipeapp.Listeners.RecipeDetailsListener;
 import ntu.nthuy.recipeapp.Listeners.SimilarRecipesListener;
+import ntu.nthuy.recipeapp.Model.FavoriteUtils;
 import ntu.nthuy.recipeapp.Model.InstructionsReponse;
 import ntu.nthuy.recipeapp.Model.RecipeDetailsResponse;
 import ntu.nthuy.recipeapp.Model.SimilarRecipesResponse;
@@ -91,26 +87,24 @@ public class RecipeDetailActivity extends AppCompatActivity {
             FirebaseDatabaseHelper myData = new FirebaseDatabaseHelper();
             boolean isFavorite = myData.isFavorite(response.id);
 
-            DatabaseReference myRef = myData.getmDatabase().child(String.valueOf(response.id));
-
             if(isFavorite){
                 favoriteButton.setImageResource(R.drawable.ic_favorite);
                 // Món ăn đã được thêm vào danh sách yêu thích
-                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        textView_meal_name.setText(snapshot.child("title").getValue(String.class));
-
-                        Document doc = Jsoup.parse(snapshot.child("summary").getValue(String.class));
-                        String rpsummary = doc.text();
-                        textView_meal_summary.setText(rpsummary);
-
-                        //Hien thi them cai note cua nguoi dung: y tuong them 1 cai bieu tuong bong bong chat
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
+//                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        textView_meal_name.setText(snapshot.child("title").getValue(String.class));
+//
+//                        Document doc = Jsoup.parse(snapshot.child("summary").getValue(String.class));
+//                        String rpsummary = doc.text();
+//                        textView_meal_summary.setText(rpsummary);
+//
+//                        //Hien thi them cai note cua nguoi dung: y tuong them 1 cai bieu tuong bong bong chat
+//                    }
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//                    }
+//                });
             }else{
                 favoriteButton.setImageResource(R.drawable.ic_favorite_border);
                 textView_meal_name.setText(response.title);
@@ -133,14 +127,16 @@ public class RecipeDetailActivity extends AppCompatActivity {
                     // Món ăn đã được thêm vào danh sách yêu thích
                     favoriteButton.setImageResource(R.drawable.ic_favorite_border);
                     // Nếu món ăn đã có trong danh sách yêu thích, xóa nó khỏi danh sách
-                    myData.deleteRecipe(response);
+
+                    myData.deleteRecipe(response.id);
                     //Thông báo
                     Toast.makeText(RecipeDetailActivity.this, "Removed", Toast.LENGTH_SHORT).show();
                 }else {
                     // Món ăn chưa được thêm vào danh sách yêu thích
                     favoriteButton.setImageResource(R.drawable.ic_favorite);
                     // Nếu món ăn chưa có trong danh sách yêu thích, thêm nó vào danh sách
-                    myData.addRecipe(response);
+                    FavoriteUtils fav = new FavoriteUtils(response.id, response.title, response.image, response.summary, "");
+                    myData.addRecipe(fav);
                     //Thông báo
                     Toast.makeText(RecipeDetailActivity.this, "Added", Toast.LENGTH_SHORT).show();
                 }
