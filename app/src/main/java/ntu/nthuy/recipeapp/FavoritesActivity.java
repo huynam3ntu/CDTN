@@ -3,9 +3,8 @@ package ntu.nthuy.recipeapp;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,8 +27,9 @@ import ntu.nthuy.recipeapp.Model.FavoriteUtils;
 public class FavoritesActivity extends AppCompatActivity {
     RecyclerView favoritesRecyclerView;
     TextView emptyFavoritesTextView;
+    ImageButton imageButton;
     private FavoritesAdapter favoritesAdapter;
-    private List<FavoriteUtils> listFav;
+    protected List<FavoriteUtils> listFav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,41 +38,44 @@ public class FavoritesActivity extends AppCompatActivity {
 
         init();
 
-        getListFavorites();
+        setEvent();
 
-        if (listFav == null) {
-            emptyFavoritesTextView.setVisibility(View.VISIBLE);
-        } else {
-            emptyFavoritesTextView.setVisibility(View.GONE);
-        }
     }
     private void init(){
         favoritesRecyclerView = findViewById(R.id.recyler_favorite_recipes);
         emptyFavoritesTextView = findViewById(R.id.empty_favorites_text_view);
+        imageButton = findViewById(R.id.imgBtnClear);
+
 
         favoritesRecyclerView.setLayoutManager(new LinearLayoutManager(FavoritesActivity.this));
-//        favoritesRecyclerView.setHasFixedSize(true);
+        favoritesRecyclerView.setHasFixedSize(true);
         listFav = new ArrayList<>();
         favoritesAdapter = new FavoritesAdapter(listFav, FavoritesActivity.this, recipeClickedListener);
         favoritesRecyclerView.setAdapter(favoritesAdapter);
     }
-    private void getListFavorites(){
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("recipes");
-        myRef.addValueEventListener(new ValueEventListener() {
+    private void setEvent(){
+        imageButton.setOnClickListener(v -> onClickReadData());
+    }
+    private void onClickReadData(){
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference databaseReference = firebaseDatabase.getReference();
+
+        databaseReference.child("recipes").addValueEventListener(new ValueEventListener() {
+
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                listFav.clear();
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    FavoriteUtils favoriteUtils = dataSnapshot.getValue(FavoriteUtils.class);
-                    listFav.add(favoriteUtils);
+                    FavoriteUtils fav = dataSnapshot.getValue(FavoriteUtils.class);
+                    listFav.add(fav);
                 }
                 favoritesAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(FavoritesActivity.this, "Get list failed", Toast.LENGTH_SHORT).show();
+
             }
         });
     }

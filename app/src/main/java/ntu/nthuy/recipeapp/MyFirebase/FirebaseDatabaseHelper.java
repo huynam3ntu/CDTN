@@ -18,21 +18,18 @@ public class FirebaseDatabaseHelper {
     }
 
     public void addRecipe(RecipeDetailsResponse recipe) {
-
-        DatabaseReference myRef = mDatabase.child(String.valueOf(recipe.id));
         listId.add(recipe.id);
-        FavoriteUtils favoriteUtils = new FavoriteUtils(recipe.id, recipe.title, recipe.image, recipe.summary, "");
-        myRef.setValue(favoriteUtils);
+        FavoriteUtils fav = new FavoriteUtils(recipe.id, recipe.title, recipe.image, recipe.summary, "");
+        mDatabase.setValue(fav);
     }
 
     public void deleteRecipe(RecipeDetailsResponse recipe) {
-        DatabaseReference myRef = mDatabase.child(String.valueOf(recipe.id));
         listId.remove(recipe.id);
-        myRef.removeValue();
+        mDatabase.removeValue();
     }
 
     public boolean isFavorite(int id) {
-        return listId.contains(id);
+        return true;
     }
 
 }
