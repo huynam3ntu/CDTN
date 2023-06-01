@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,9 +41,8 @@ public class FavoritesActivity extends AppCompatActivity {
     RecyclerView favoritesRecyclerView;
     TextView emptyFavoritesTextView;
     private FavoritesAdapter favoritesAdapter;
-    protected List<RecipeDetailsResponse> listFav;
+    private List<RecipeDetailsResponse> listFav;
     Toolbar toolbar;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +50,16 @@ public class FavoritesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_favorites);
 
         init();
-
+        
+        favoritesRecyclerView.setHasFixedSize(true);
+        favoritesRecyclerView.setLayoutManager(new LinearLayoutManager(FavoritesActivity.this));
+        listFav = new ArrayList<>();
+        favoritesAdapter = new FavoritesAdapter(listFav, FavoritesActivity.this, recipeClickedListener);
+        favoritesRecyclerView.setAdapter(favoritesAdapter);
 
         onClickReadData();
 
-        FirebaseDatabaseHelper myhelper = new FirebaseDatabaseHelper();
-        if(myhelper.getListId()==null)
+        if(favoritesAdapter.getItemCount()!=0)
             emptyFavoritesTextView.setVisibility(View.VISIBLE);
         else
             emptyFavoritesTextView.setVisibility(View.GONE);
@@ -67,6 +71,7 @@ public class FavoritesActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_favorite, menu);
         return true;
     }
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
@@ -74,23 +79,15 @@ public class FavoritesActivity extends AppCompatActivity {
         if(id == R.id.add_recipe){
             // Xử lý sự kiện khi người dùng chọn nút "Add Recipe"
             showAddRecipeDialog();
+            //update lại data cho favoritesAdapter
+            favoritesAdapter.notifyDataSetChanged();
             return true;
-        }else
-            if(id == android.R.id.home){
-                finish();
-                return true;
-            }
+        }
         return super.onOptionsItemSelected(item);
     }
     private void init(){
         favoritesRecyclerView = findViewById(R.id.recyler_favorite_recipes);
         emptyFavoritesTextView = findViewById(R.id.empty_favorites_text_view);
-
-        favoritesRecyclerView.setLayoutManager(new LinearLayoutManager(FavoritesActivity.this));
-        favoritesRecyclerView.setHasFixedSize(true);
-        listFav = new ArrayList<>();
-        favoritesAdapter = new FavoritesAdapter(listFav, FavoritesActivity.this, recipeClickedListener);
-        favoritesRecyclerView.setAdapter(favoritesAdapter);
 
         toolbar = findViewById(R.id.toolbarFav);
         setSupportActionBar(toolbar);
@@ -115,8 +112,7 @@ public class FavoritesActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
-
+                Toast.makeText(FavoritesActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -160,6 +156,7 @@ public class FavoritesActivity extends AppCompatActivity {
             // Thêm mới món ăn vào Firebase Realtime Database
             FirebaseDatabaseHelper databaseHelper = new FirebaseDatabaseHelper();
             databaseHelper.addRecipe(recipe);
+
             dialog.dismiss();
         });
         // Hiển thị dialog

@@ -6,6 +6,9 @@ public class ExtendedIngredient {
     public String name;
     public String original;
 
+    public ExtendedIngredient() {
+    }
+
     public ExtendedIngredient(int id, String image, String name, String original) {
         this.id = id;
         this.image = image;
