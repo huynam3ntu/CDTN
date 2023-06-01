@@ -10,13 +10,6 @@
         android:layout_height="wrap_content"
         app:title="Favorite Recipes"
         app:titleTextColor="@color/white"/>
-    <ImageButton
-        android:id="@+id/imgBtnClear"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/ic_refresh"
-        android:layout_margin="4dp"
-        android:contentDescription="clear"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyler_favorite_recipes"

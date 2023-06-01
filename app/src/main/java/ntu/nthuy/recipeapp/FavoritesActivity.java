@@ -3,7 +3,6 @@ package ntu.nthuy.recipeapp;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -27,7 +26,6 @@ import ntu.nthuy.recipeapp.Model.FavoriteUtils;
 public class FavoritesActivity extends AppCompatActivity {
     RecyclerView favoritesRecyclerView;
     TextView emptyFavoritesTextView;
-    ImageButton imageButton;
     private FavoritesAdapter favoritesAdapter;
     protected List<FavoriteUtils> listFav;
 
@@ -38,13 +36,12 @@ public class FavoritesActivity extends AppCompatActivity {
 
         init();
 
-        setEvent();
+        onClickReadData();
 
     }
     private void init(){
         favoritesRecyclerView = findViewById(R.id.recyler_favorite_recipes);
         emptyFavoritesTextView = findViewById(R.id.empty_favorites_text_view);
-        imageButton = findViewById(R.id.imgBtnClear);
 
 
         favoritesRecyclerView.setLayoutManager(new LinearLayoutManager(FavoritesActivity.this));
@@ -53,15 +50,11 @@ public class FavoritesActivity extends AppCompatActivity {
         favoritesAdapter = new FavoritesAdapter(listFav, FavoritesActivity.this, recipeClickedListener);
         favoritesRecyclerView.setAdapter(favoritesAdapter);
     }
-    private void setEvent(){
-        imageButton.setOnClickListener(v -> onClickReadData());
-    }
     private void onClickReadData(){
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = firebaseDatabase.getReference();
 
         databaseReference.child("recipes").addValueEventListener(new ValueEventListener() {
-
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

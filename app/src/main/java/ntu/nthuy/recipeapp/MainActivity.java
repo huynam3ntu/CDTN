@@ -1,12 +1,5 @@
 package ntu.nthuy.recipeapp;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -15,6 +8,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
     private final  RecipeClickedListener recipeClickedListener = new RecipeClickedListener() {
         @Override
         public void onRecipeClicked(String id) {
+
             startActivity(new Intent(MainActivity.this, RecipeDetailActivity.class)
                     .putExtra("id", id));
         }

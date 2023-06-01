@@ -59,7 +59,9 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
         id = Integer.parseInt(getIntent().getStringExtra("id"));
         manager = new RequestManager(this);
+
         manager.getRecipeDetails(recipeDetailsListener, id);
+
         manager.getSimilarRecipes(similarRecipesListener, id);
         manager.getInstructions(instructionsListener, id);
 
@@ -88,7 +90,8 @@ public class RecipeDetailActivity extends AppCompatActivity {
 
             FirebaseDatabaseHelper myData = new FirebaseDatabaseHelper();
             boolean isFavorite = myData.isFavorite(response.id);
-            DatabaseReference myRef = myData.mDatabase.child(String.valueOf(response.id));
+
+            DatabaseReference myRef = myData.getmDatabase().child(String.valueOf(response.id));
 
             if(isFavorite){
                 favoriteButton.setImageResource(R.drawable.ic_favorite);
