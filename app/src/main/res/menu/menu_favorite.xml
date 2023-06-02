@@ -6,4 +6,14 @@
         android:title="Add Recipe"
         android:icon="@drawable/ic_add_recipe"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_home"
+        android:icon="@drawable/ic_home"
+        android:title="Home"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_favorites"
+        android:icon="@drawable/ic_favorite"
+        android:title="Favorites"
+        app:showAsAction="always" />
 </menu>

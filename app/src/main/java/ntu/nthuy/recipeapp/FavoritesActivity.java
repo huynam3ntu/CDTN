@@ -39,7 +39,6 @@ import ntu.nthuy.recipeapp.Model.RecipeDetailsResponse;
 import ntu.nthuy.recipeapp.MyFirebase.FirebaseDatabaseHelper;
 
 public class FavoritesActivity extends AppCompatActivity{
-    int id;
     RecyclerView favoritesRecyclerView;
     TextView emptyFavoritesTextView;
     private FavoritesAdapter favoritesAdapter;
@@ -60,6 +59,11 @@ public class FavoritesActivity extends AppCompatActivity{
         else
             emptyFavoritesTextView.setVisibility(View.GONE);
 
+        onClickIconHome();
+    }
+
+    private void onClickIconHome() {
+
     }
 
     @Override
@@ -79,6 +83,14 @@ public class FavoritesActivity extends AppCompatActivity{
             favoritesAdapter.notifyDataSetChanged();
             return true;
         }
+        else
+            if(itemId == R.id.action_home){
+                // Chuyển sang màn hình MainActivity
+                Intent intent = new Intent(FavoritesActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+                return true;
+            }
         return super.onOptionsItemSelected(item);
     }
     private void init(){
@@ -143,15 +155,7 @@ public class FavoritesActivity extends AppCompatActivity{
 
         //  Thêm listener cho nút "Choose Image"
         Button chooseImg = view.findViewById(R.id.button_chooseImgFav);
-        chooseImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                pickImage();
-
-            }
-
-        });
+        chooseImg.setOnClickListener(v -> pickImage());
         // Thiết lập layout cho dialog
         builder.setView(view);
         // Thêm các nút "Cancel" và "Add"
@@ -221,7 +225,10 @@ public class FavoritesActivity extends AppCompatActivity{
         dialog.show();
     }
 
-    private final RecipeClickedListener recipeClickedListener = id -> startActivity(new Intent(FavoritesActivity.this, RecipeDetailActivity.class)
-            .putExtra("id", id));
-
+    private final RecipeClickedListener recipeClickedListener = new RecipeClickedListener() {
+        @Override
+        public void onRecipeClicked(String id) {
+            Toast.makeText(FavoritesActivity.this, id, Toast.LENGTH_SHORT).show();
+        }
+    };
 }

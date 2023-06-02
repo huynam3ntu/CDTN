@@ -23,7 +23,6 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesViewHolder>{
     private final List<RecipeDetailsResponse> listFav;
     Context context;
     RecipeClickedListener clickedListener;
-
     public FavoritesAdapter(List<RecipeDetailsResponse> listFav, Context context, RecipeClickedListener clickedListener) {
         this.listFav = listFav;
         this.context = context;
@@ -41,9 +40,9 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesViewHolder>{
         RecipeDetailsResponse fav = listFav.get(position);
         if(fav != null) {
             holder.item_favorite_number.setText(String.valueOf(position + 1));
-            Picasso.get().load(listFav.get(position).image).into(holder.item_favorite_image);
-            holder.item_favorite_name.setText(listFav.get(position).title);
-            holder.list_favorites.setOnClickListener(v -> clickedListener.onRecipeClicked(String.valueOf(listFav.get(holder.getAdapterPosition()).id)));
+            Picasso.get().load(fav.image).into(holder.item_favorite_image);
+            holder.item_favorite_name.setText(fav.title);
+            holder.list_favorites.setOnClickListener(v -> clickedListener.onRecipeClicked(String.valueOf(fav.id)));
         }
     }
 

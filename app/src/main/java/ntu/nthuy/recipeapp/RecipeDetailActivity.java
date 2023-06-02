@@ -67,6 +67,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         myData = new FirebaseDatabaseHelper();
         isFavorite = myData.isFavorite(id);
         if(isFavorite){
+            loadRecipeDetails();
             showDetails();
 
         }else{
@@ -82,12 +83,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
         dialog = builderDialog.create();
         dialog.show();
     }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        loadRecipeDetails();
-    }
-
     private void loadRecipeDetails() {
         DatabaseReference recipeRef = FirebaseDatabase.getInstance().getReference("recipes").child(String.valueOf(id));
         recipeRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -99,12 +94,10 @@ public class RecipeDetailActivity extends AppCompatActivity {
                     recipeFavoriteDetailsListener.didFetch(recipeDetailsResponse);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-
         });
     }
 
