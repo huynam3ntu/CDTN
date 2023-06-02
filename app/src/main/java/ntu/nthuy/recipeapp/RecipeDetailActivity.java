@@ -7,11 +7,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
@@ -25,6 +31,7 @@ import ntu.nthuy.recipeapp.Adapters.SimilarRecipesAdapter;
 import ntu.nthuy.recipeapp.Listeners.InstructionsListener;
 import ntu.nthuy.recipeapp.Listeners.RecipeClickedListener;
 import ntu.nthuy.recipeapp.Listeners.RecipeDetailsListener;
+import ntu.nthuy.recipeapp.Listeners.RecipeFavoriteDetailsListener;
 import ntu.nthuy.recipeapp.Listeners.SimilarRecipesListener;
 import ntu.nthuy.recipeapp.Model.InstructionsReponse;
 import ntu.nthuy.recipeapp.Model.RecipeDetailsResponse;
@@ -44,6 +51,9 @@ public class RecipeDetailActivity extends AppCompatActivity {
     SimilarRecipesAdapter similarRecipesAdapter;
     InstructionsAdapter instructionsAdapter;
     ImageButton favoriteButton;
+    boolean isFavorite;
+    FirebaseDatabaseHelper myData;
+    private RecipeFavoriteDetailsListener recipeFavoriteDetailsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,17 +63,78 @@ public class RecipeDetailActivity extends AppCompatActivity {
         findViews();
 
         id = Integer.parseInt(getIntent().getStringExtra("id"));
-        manager = new RequestManager(this);
 
-        manager.getRecipeDetails(recipeDetailsListener, id);
-        manager.getSimilarRecipes(similarRecipesListener, id);
-        manager.getInstructions(instructionsListener, id);
+        myData = new FirebaseDatabaseHelper();
+        isFavorite = myData.isFavorite(id);
+        if(isFavorite){
+            showDetails();
+
+        }else{
+            manager = new RequestManager(this);
+            manager.getRecipeDetails(recipeDetailsListener, id);
+            manager.getSimilarRecipes(similarRecipesListener, id);
+            manager.getInstructions(instructionsListener, id);
+        }
 
         builderDialog = new AlertDialog.Builder(this);
         builderDialog.setMessage("Loading Details...");
         builderDialog.setCancelable(false);
         dialog = builderDialog.create();
         dialog.show();
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        loadRecipeDetails();
+    }
+
+    private void loadRecipeDetails() {
+        DatabaseReference recipeRef = FirebaseDatabase.getInstance().getReference("recipes").child(String.valueOf(id));
+        recipeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                RecipeDetailsResponse recipeDetailsResponse = snapshot.getValue(RecipeDetailsResponse.class);
+                if (recipeDetailsResponse != null) {
+                    // Nếu có đối tượng trả về, thì sẽ truyền đối tượng cho bộ lắng nghe
+                    recipeFavoriteDetailsListener.didFetch(recipeDetailsResponse);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+
+        });
+    }
+
+    private void showDetails() {
+        setRecipeFavoriteDetailsListener(new RecipeFavoriteDetailsListener() {
+            @Override
+            public void didFetch(RecipeDetailsResponse response) {
+                dialog.dismiss();
+
+                favoriteButton.setImageResource(R.drawable.ic_favorite);
+                textView_meal_name.setText(response.title);
+
+                Document doc = Jsoup.parse(response.summary);
+                String rpsummary = doc.text();
+                textView_meal_summary.setText(rpsummary);
+
+                textView_meal_source.setText(response.sourceName);
+                Picasso.get().load(response.image).into(imageView_meal_image);
+
+                recyler_meal_ingredients.setHasFixedSize(true);
+                recyler_meal_ingredients.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
+                ingredientsAdapter = new IngredientsAdapter(RecipeDetailActivity.this, response.extendedIngredients);
+                recyler_meal_ingredients.setAdapter(ingredientsAdapter);
+            }
+        });
+    }
+
+
+    public void setRecipeFavoriteDetailsListener(RecipeFavoriteDetailsListener listener) {
+        this.recipeFavoriteDetailsListener = listener;
     }
 
     private void findViews() {
@@ -77,40 +148,17 @@ public class RecipeDetailActivity extends AppCompatActivity {
         favoriteButton = findViewById(R.id.favorite_button);
     }
 
+    // Các bộ lắng nghe dữ liệu API
     private final RecipeDetailsListener recipeDetailsListener = new RecipeDetailsListener() {
         @Override
         public void didFetch(RecipeDetailsResponse response, String message) {
             dialog.dismiss();
 
-            FirebaseDatabaseHelper myData = new FirebaseDatabaseHelper();
-            boolean isFavorite = myData.isFavorite(response.id);
-
-            if(isFavorite){
-                favoriteButton.setImageResource(R.drawable.ic_favorite);
-                // Món ăn đã được thêm vào danh sách yêu thích
-//                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                        textView_meal_name.setText(snapshot.child("title").getValue(String.class));
-//
-//                        Document doc = Jsoup.parse(snapshot.child("summary").getValue(String.class));
-//                        String rpsummary = doc.text();
-//                        textView_meal_summary.setText(rpsummary);
-//
-//                        //Hien thi them cai note cua nguoi dung: y tuong them 1 cai bieu tuong bong bong chat
-//                    }
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError error) {
-//                    }
-//                });
-            }else{
-                favoriteButton.setImageResource(R.drawable.ic_favorite_border);
-                textView_meal_name.setText(response.title);
-                Document doc = Jsoup.parse(response.summary);
-                String rpsummary = doc.text();
-                textView_meal_summary.setText(rpsummary);
-
-            }
+            favoriteButton.setImageResource(R.drawable.ic_favorite_border);
+            textView_meal_name.setText(response.title);
+            Document doc = Jsoup.parse(response.summary);
+            String rpsummary = doc.text();
+            textView_meal_summary.setText(rpsummary);
 
             textView_meal_source.setText(response.sourceName);
             Picasso.get().load(response.image).into(imageView_meal_image);
@@ -159,10 +207,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
             Toast.makeText(RecipeDetailActivity.this, message, Toast.LENGTH_SHORT).show();
         }
     };
-
-    private final RecipeClickedListener recipeClickedListener = id -> startActivity(new Intent(RecipeDetailActivity.this, RecipeDetailActivity.class)
-            .putExtra("id", id));
-
     private final InstructionsListener instructionsListener = new InstructionsListener() {
         @Override
         public void didFetch(List<InstructionsReponse> reponse, String message) {
@@ -171,10 +215,12 @@ public class RecipeDetailActivity extends AppCompatActivity {
             instructionsAdapter = new InstructionsAdapter(RecipeDetailActivity.this, reponse);
             recyler_meal_instructions.setAdapter(instructionsAdapter);
         }
-
         @Override
         public void didError(String message) {
             Toast.makeText(RecipeDetailActivity.this, message, Toast.LENGTH_SHORT).show();
         }
     };
+    private final RecipeClickedListener recipeClickedListener = id -> startActivity(new Intent(RecipeDetailActivity.this, RecipeDetailActivity.class)
+            .putExtra("id", id));
+
 }
