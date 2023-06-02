@@ -68,6 +68,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         isFavorite = myData.isFavorite(id);
         if(isFavorite){
             loadRecipeDetails();
+            setRecipeFavoriteDetailsListener(recipeFavoriteDetailsListener);
             showDetails();
 
         }else{
@@ -102,26 +103,23 @@ public class RecipeDetailActivity extends AppCompatActivity {
     }
 
     private void showDetails() {
-        setRecipeFavoriteDetailsListener(new RecipeFavoriteDetailsListener() {
-            @Override
-            public void didFetch(RecipeDetailsResponse response) {
-                dialog.dismiss();
+        setRecipeFavoriteDetailsListener(response -> {
+            dialog.dismiss();
 
-                favoriteButton.setImageResource(R.drawable.ic_favorite);
-                textView_meal_name.setText(response.title);
+            favoriteButton.setImageResource(R.drawable.ic_favorite);
+            textView_meal_name.setText(response.title);
 
-                Document doc = Jsoup.parse(response.summary);
-                String rpsummary = doc.text();
-                textView_meal_summary.setText(rpsummary);
+            Document doc = Jsoup.parse(response.summary);
+            String rpsummary = doc.text();
+            textView_meal_summary.setText(rpsummary);
 
-                textView_meal_source.setText(response.sourceName);
-                Picasso.get().load(response.image).into(imageView_meal_image);
+            textView_meal_source.setText(response.sourceName);
+            Picasso.get().load(response.image).into(imageView_meal_image);
 
-                recyler_meal_ingredients.setHasFixedSize(true);
-                recyler_meal_ingredients.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
-                ingredientsAdapter = new IngredientsAdapter(RecipeDetailActivity.this, response.extendedIngredients);
-                recyler_meal_ingredients.setAdapter(ingredientsAdapter);
-            }
+            recyler_meal_ingredients.setHasFixedSize(true);
+            recyler_meal_ingredients.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
+            ingredientsAdapter = new IngredientsAdapter(RecipeDetailActivity.this, response.extendedIngredients);
+            recyler_meal_ingredients.setAdapter(ingredientsAdapter);
         });
     }
 

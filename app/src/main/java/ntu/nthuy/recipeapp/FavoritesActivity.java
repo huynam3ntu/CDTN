@@ -225,10 +225,5 @@ public class FavoritesActivity extends AppCompatActivity{
         dialog.show();
     }
 
-    private final RecipeClickedListener recipeClickedListener = new RecipeClickedListener() {
-        @Override
-        public void onRecipeClicked(String id) {
-            Toast.makeText(FavoritesActivity.this, id, Toast.LENGTH_SHORT).show();
-        }
-    };
+    private final RecipeClickedListener recipeClickedListener = id -> startActivity(new Intent(FavoritesActivity.this, RecipeDetailActivity.class).putExtra("id", id));
 }
