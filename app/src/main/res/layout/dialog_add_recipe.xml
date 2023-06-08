@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -13,7 +14,8 @@
         android:textColor="@color/black"
         android:textStyle="normal"
         android:inputType="text"
-        android:autofillHints="name"/>
+        android:autofillHints="name"
+        tools:ignore="HardcodedText" />
 
     <EditText
         android:id="@+id/edt_dialogFav_source"
@@ -24,20 +26,8 @@
         android:textColor="@color/black"
         android:textStyle="normal"
         android:inputType="text"
-        android:autofillHints="source"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ingredients"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyler_ingredients_fav"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
+        android:autofillHints="source"
+        tools:ignore="HardcodedText" />
     <EditText
         android:id="@+id/edt_dialogFav_summary"
         android:layout_width="200dp"
@@ -47,24 +37,34 @@
         android:textColor="@color/black"
         android:textStyle="normal"
         android:autofillHints="summary"
-        android:inputType="text"/>
+        android:inputType="text"
+        tools:ignore="HardcodedText" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingredients"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:ignore="HardcodedText" />
     <Button
         android:id="@+id/button_add_ingredient"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Ingredient" />
+        android:text="Add Ingredient"
+        tools:ignore="HardcodedText" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyler_ingredients_fav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/button_chooseImgFav"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:layout_gravity="center_horizontal"/>
+
     <ImageView
         android:id="@+id/imageView_dialogFav_meal"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:contentDescription="Meal Image"/>
+        android:src="@drawable/choose_img"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="Meal Image"
+        tools:ignore="HardcodedText" />
 
 </LinearLayout>

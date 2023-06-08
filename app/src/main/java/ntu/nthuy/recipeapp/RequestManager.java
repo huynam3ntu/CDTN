@@ -52,7 +52,6 @@ public class RequestManager {
             }
         });
     }
-
     public void getRecipeDetails(RecipeDetailsListener listener, int id){
         CallRecipeDetails callRecipeDetails = retrofit.create(CallRecipeDetails.class);
         Call<RecipeDetailsResponse> call = callRecipeDetails.callRecipeDetails(id, context.getString(R.string.api_key));
@@ -72,7 +71,6 @@ public class RequestManager {
             }
         });
     }
-
     public void getSimilarRecipes(SimilarRecipesListener listener, int id){
         CallSimilarRecipes callSimilarRecipes = retrofit.create(CallSimilarRecipes.class);
         Call<List<SimilarRecipesResponse>> call = callSimilarRecipes.callSimilarRecipes(id, "10", context.getString(R.string.api_key));
@@ -92,7 +90,6 @@ public class RequestManager {
             }
         });
     }
-
     public void getInstructions(InstructionsListener listener, int id){
         CallInstructions callInstructions = retrofit.create(CallInstructions.class);
         Call<List<InstructionsReponse>> call = callInstructions.callInstructions(id, context.getString(R.string.api_key));
@@ -112,6 +109,7 @@ public class RequestManager {
             }
         });
     }
+
     private interface CallRandomRecipes{
         @GET("recipes/random")
         Call<RandomRecipeApiResponse> callRandomRecipe(
@@ -120,7 +118,6 @@ public class RequestManager {
                 @Query("tags") List<String> tags
         );
     }
-
     private interface CallRecipeDetails{
         @GET("recipes/{id}/information")
         Call<RecipeDetailsResponse> callRecipeDetails(
@@ -128,7 +125,6 @@ public class RequestManager {
                 @Query("apiKey") String apiKey
         );
     }
-
     private interface CallSimilarRecipes{
         @GET("recipes/{id}/similar")
         Call<List<SimilarRecipesResponse>> callSimilarRecipes(
@@ -137,7 +133,6 @@ public class RequestManager {
                 @Query("apiKey") String apiKey
         );
     }
-
     private interface CallInstructions{
         @GET("recipes/{id}/analyzedInstructions")
         Call<List<InstructionsReponse>> callInstructions(
@@ -145,4 +140,5 @@ public class RequestManager {
                 @Query("apiKey") String apiKey
         );
     }
+
 }

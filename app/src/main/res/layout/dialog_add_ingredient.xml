@@ -6,19 +6,22 @@
     android:padding="16dp">
     <EditText
         android:id="@+id/edt_dialogIngredient_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Name" />
-
-    <EditText
-        android:id="@+id/edt_dialogIngredient_image"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Image" />
+        android:layout_width="350dp"
+        android:layout_height="60dp"
+        android:hint="Name"
+        android:inputType="text"
+        android:autofillHints="name" />
     <EditText
         android:id="@+id/edt_dialogIngredient_original"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Original/Much" />
+        android:layout_width="350dp"
+        android:layout_height="60dp"
+        android:hint="Original/Much"
+        android:autofillHints="much"
+        android:inputType="text"/>
+    <ImageView
+        android:id="@+id/imageView_dialogAdd"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="imageIngredient"/>
 
 </LinearLayout>
