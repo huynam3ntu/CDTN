@@ -39,6 +39,7 @@ import ntu.nthuy.recipeapp.Model.RecipeDetailsResponse;
 import ntu.nthuy.recipeapp.MyFirebase.FirebaseDatabaseHelper;
 
 public class FavoritesActivity extends AppCompatActivity{
+    private boolean fromEdit;
     RecyclerView favoritesRecyclerView;
     TextView emptyFavoritesTextView;
     private FavoritesAdapter favoritesAdapter;
@@ -46,12 +47,14 @@ public class FavoritesActivity extends AppCompatActivity{
     Toolbar toolbar;
     FirebaseStorage storage = FirebaseStorage.getInstance();
 //    ImageView imageViewMeal;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
-
+        fromEdit = getIntent().getBooleanExtra("fromEdit", false);
+        if(fromEdit)
+            Toast.makeText(this, "New Updated!!", Toast.LENGTH_SHORT).show();
         init();
 
         onClickReadData();
@@ -60,6 +63,7 @@ public class FavoritesActivity extends AppCompatActivity{
             emptyFavoritesTextView.setVisibility(View.VISIBLE);
         else
             emptyFavoritesTextView.setVisibility(View.GONE);
+        
     }
 
     @Override
@@ -105,12 +109,12 @@ public class FavoritesActivity extends AppCompatActivity{
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
     }
 
-
     private void showAddRecipeDialog() {
         // Hiển thị dialog để người dùng nhập liệu và thêm mới món ăn
         // Tạo dialog builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add Recipe");
+
         // Tạo layout cho dialog
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_add_recipe, null);
         EditText titleEditText = view.findViewById(R.id.edt_dialogFav_title);

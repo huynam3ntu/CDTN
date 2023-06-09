@@ -1,9 +1,11 @@
 package ntu.nthuy.recipeapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,9 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 import ntu.nthuy.recipeapp.Adapters.IngredientsAdapter;
-import ntu.nthuy.recipeapp.Adapters.InstructionsAdapter;
 import ntu.nthuy.recipeapp.Model.ExtendedIngredient;
-import ntu.nthuy.recipeapp.Model.InstructionsReponse;
 import ntu.nthuy.recipeapp.Model.RecipeDetailsResponse;
 
 public class EditDetailsRecipeActivity extends AppCompatActivity {
@@ -38,6 +38,7 @@ public class EditDetailsRecipeActivity extends AppCompatActivity {
         findViews();
         // Lấy id của đối tượng RecipeDetailsResponse cần chỉnh sửa từ intent
         String recipeId = getIntent().getStringExtra("id");
+        Toast.makeText(this, recipeId, Toast.LENGTH_SHORT).show();
 
         // Khởi tạo DatabaseReference để truy cập đến đối tượng RecipeDetailsResponse
         // tương ứng trên Firebase Realtime
@@ -57,10 +58,10 @@ public class EditDetailsRecipeActivity extends AppCompatActivity {
                 IngredientsAdapter extendedIngredientsAdapter = new IngredientsAdapter(EditDetailsRecipeActivity.this, recipeDetails.getExtendedIngredients());
                 extendedIngredientsRecyclerView.setAdapter(extendedIngredientsAdapter);
 
-                instructionsRecyclerView.setHasFixedSize(true);
-                instructionsRecyclerView.setLayoutManager(new LinearLayoutManager(EditDetailsRecipeActivity.this, LinearLayoutManager.HORIZONTAL, false));
-                InstructionsAdapter instructionsAdapter = new InstructionsAdapter(EditDetailsRecipeActivity.this, recipeDetails.getInstructionsReponses());
-                instructionsRecyclerView.setAdapter(instructionsAdapter);
+//                instructionsRecyclerView.setHasFixedSize(true);
+//                instructionsRecyclerView.setLayoutManager(new LinearLayoutManager(EditDetailsRecipeActivity.this, LinearLayoutManager.HORIZONTAL, false));
+//                InstructionsAdapter instructionsAdapter = new InstructionsAdapter(EditDetailsRecipeActivity.this, recipeDetails.getInstructionsReponses());
+//                instructionsRecyclerView.setAdapter(instructionsAdapter);
 
                 summaryEditText.setText(recipeDetails.getSummary());
                 noteEditText.setText(recipeDetails.getNote());
@@ -80,7 +81,7 @@ public class EditDetailsRecipeActivity extends AppCompatActivity {
                 String image = ((EditText) findViewById(R.id.edt_edit_image)).getText().toString();
                 String sourceName = ((EditText) findViewById(R.id.edt_edit_source_name)).getText().toString();
                 ArrayList<ExtendedIngredient> extendedIngredients = ((IngredientsAdapter) extendedIngredientsRecyclerView.getAdapter()).getIngredient();
-                ArrayList<InstructionsReponse> instructionsReponses = ((InstructionsAdapter) instructionsRecyclerView.getAdapter()).getInstructions();
+//                ArrayList<InstructionsReponse> instructionsReponses = ((InstructionsAdapter) instructionsRecyclerView.getAdapter()).getInstructions();
                 String summary = ((EditText) findViewById(R.id.summary_edit_text)).getText().toString();
                 String note = ((EditText) findViewById(R.id.note_edit_text)).getText().toString();
 
@@ -89,13 +90,13 @@ public class EditDetailsRecipeActivity extends AppCompatActivity {
                 recipeDetails.setImage(image);
                 recipeDetails.setSourceName(sourceName);
                 recipeDetails.setExtendedIngredients(extendedIngredients);
-                recipeDetails.setInstructionsReponses(instructionsReponses);
+//                recipeDetails.setInstructionsReponses(instructionsReponses);
                 recipeDetails.setSummary(summary);
                 recipeDetails.setNote(note);
                 recipeRef.setValue(recipeDetails);
 
-                // Trở về màn hình trước đó
-                finish();
+                // Trở về danh sách favorite
+                startActivity(new Intent(EditDetailsRecipeActivity.this, FavoritesActivity.class).putExtra("fromEdit", true));
             }
         });
     }

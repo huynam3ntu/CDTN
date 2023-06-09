@@ -35,16 +35,4 @@ public class FirebaseDatabaseHelper {
         myRef.setValue(reponse);
     }
 
-    public void deleteRecipe(int recipeId) {
-        DatabaseReference myRef = mDatabase.child(String.valueOf(recipeId));
-        listId.remove(recipeId);
-        mDatabase.removeValue();
-    }
-
-    public boolean isFavorite(int id) {
-        if(mDatabase.child(String.valueOf(id)).getDatabase()!=null)
-            return false;
-        return true;
-    }
-
 }

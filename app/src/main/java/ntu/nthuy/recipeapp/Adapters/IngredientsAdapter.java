@@ -1,9 +1,11 @@
 package ntu.nthuy.recipeapp.Adapters;
 
 import android.content.Context;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,11 +45,36 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsViewHold
 
     @Override
     public void onBindViewHolder(@NonNull IngredientsViewHolder holder, int position) {
+        ExtendedIngredient extendedIngredient = list.get(position);
+        // Hiển thị thông tin của đối tượng lên layout
         holder.textView_ingredients_name.setText(list.get(position).name);
         holder.textView_ingredients_name.setSelected(true);
         holder.textView_ingredients_quantity.setText(list.get(position).original);
         holder.textView_ingredients_quantity.setSelected(true);
         Picasso.get().load("https://spoonacular.com/cdn/ingredients_100x100/" + list.get(position).image).into(holder.imageView_ingredients);
+
+        // Thiết lập sự kiện chỉnh sửa cho từng view
+        holder.textView_ingredients_name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    extendedIngredient.setName(v.getText().toString());
+                    return true;
+                }
+                return false;
+            }
+        });
+        holder.textView_ingredients_quantity.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    extendedIngredient.setOriginal(v.getText().toString());
+                    return true;
+                }
+                return false;
+            }
+        });
+        // Image?
     }
 
     @Override

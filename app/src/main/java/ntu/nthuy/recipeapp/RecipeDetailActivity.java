@@ -1,5 +1,6 @@
 package ntu.nthuy.recipeapp;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -54,7 +56,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
     IngredientsAdapter ingredientsAdapter;
     SimilarRecipesAdapter similarRecipesAdapter;
     InstructionsAdapter instructionsAdapter;
-    ImageButton favoriteButton;
+    ImageButton favoriteButton, deleteButton;
     boolean isFavorite = false;
     FirebaseDatabaseHelper myData;
     private RecipeFavoriteDetailsListener recipeFavoriteDetailsListener;
@@ -71,28 +73,17 @@ public class RecipeDetailActivity extends AppCompatActivity {
 //        fromFavorites = getIntent().getBooleanExtra("fromFav", false);
 
         if(fromMain){
-            Toast.makeText(RecipeDetailActivity.this, "NOT FAVORITE!!!!!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RecipeDetailActivity.this, "NOT FROM FAVORITE!!!!!!", Toast.LENGTH_SHORT).show();
 
             manager = new RequestManager(this);
             manager.getRecipeDetails(recipeDetailsListener, id);
             manager.getSimilarRecipes(similarRecipesListener, id);
             manager.getInstructions(instructionsListener, id);
         } else {
-            favoriteButton.setImageResource(R.drawable.ic_edit_button);
-            Toast.makeText(RecipeDetailActivity.this, "FAVORITE!!!!!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RecipeDetailActivity.this, "FROM FAVORITE!!!!!!", Toast.LENGTH_SHORT).show();
             loadRecipeDetails();
             setRecipeFavoriteDetailsListener(recipeFavoriteDetailsListener);
             showDetails();
-            favoriteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(RecipeDetailActivity.this, String.valueOf(id), Toast.LENGTH_SHORT).show();
-//                    Intent intent = new Intent(RecipeDetailActivity.this, EditDetailsRecipeActivity.class);
-//                    intent.putExtra("fromFav", true);
-//                    intent.putExtra("id", id);
-//                    startActivity(intent);
-                }
-            });
         }
 
         builderDialog = new AlertDialog.Builder(this);
@@ -118,25 +109,66 @@ public class RecipeDetailActivity extends AppCompatActivity {
             }
         });
     }
-
     private void showDetails() {
         setRecipeFavoriteDetailsListener(response -> {
             dialog.dismiss();
             Toast.makeText(this, String.valueOf(response.id), Toast.LENGTH_SHORT).show();
-            favoriteButton.setImageResource(R.drawable.ic_favorite);
-            textView_meal_name.setText(response.title);
 
+            favoriteButton.setImageResource(R.drawable.ic_edit_button);
+
+            textView_meal_name.setText(response.title);
             Document doc = Jsoup.parse(response.summary);
             String rpsummary = doc.text();
             textView_meal_summary.setText(rpsummary);
-
             textView_meal_source.setText(response.sourceName);
             Picasso.get().load(response.image).into(imageView_meal_image);
 
+            //Hiển thị dữ liệu lên Recycler View
             recyler_meal_ingredients.setHasFixedSize(true);
             recyler_meal_ingredients.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
             ingredientsAdapter = new IngredientsAdapter(RecipeDetailActivity.this, response.extendedIngredients);
             recyler_meal_ingredients.setAdapter(ingredientsAdapter);
+
+            //Hiển thị dữ liệu lên Recycler View -- đang bị lỗi
+//            recyler_meal_instructions.setHasFixedSize(true);
+//            recyler_meal_instructions.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.VERTICAL, false));
+//            instructionsAdapter = new InstructionsAdapter(RecipeDetailActivity.this, response.instructionsReponses);
+//            recyler_meal_instructions.setAdapter(instructionsAdapter);
+
+            favoriteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(RecipeDetailActivity.this, String.valueOf(id), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(RecipeDetailActivity.this, EditDetailsRecipeActivity.class);
+                    intent.putExtra("fromDetailFav", true);
+                    intent.putExtra("id", String.valueOf(id));
+                    startActivity(intent);
+                }
+            });
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(RecipeDetailActivity.this);
+                    builder.setMessage("Are you sure you want to delete?");
+                    builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Thực hiện xóa đối tượng RecipeDetailsResponse trên Firebase Realtime
+                            DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("recipes").child(String.valueOf(id));
+                            myRef.removeValue(new DatabaseReference.CompletionListener() {
+                                @Override
+                                public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                                    Toast.makeText(RecipeDetailActivity.this, "Delete completed!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            finish();
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", null);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }
+            });
         });
     }
 
@@ -153,6 +185,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         recyler_meal_similar = findViewById(R.id.recyler_meal_similar);
         recyler_meal_instructions = findViewById(R.id.recyler_meal_instructions);
         favoriteButton = findViewById(R.id.favorite_button);
+        deleteButton = findViewById(R.id.favorite_delete_button);
 
         myData = new FirebaseDatabaseHelper();
     }
@@ -178,22 +211,13 @@ public class RecipeDetailActivity extends AppCompatActivity {
             recyler_meal_ingredients.setAdapter(ingredientsAdapter);
 
             favoriteButton.setOnClickListener(v -> {
-                if(isFavorite){
-                    // Món ăn đã được thêm vào danh sách yêu thích
-                    favoriteButton.setImageResource(R.drawable.ic_favorite_border);
-
-                    myData.deleteRecipe(response.id);
-                    //Thông báo
-                    Toast.makeText(RecipeDetailActivity.this, "Removed from favorites", Toast.LENGTH_SHORT).show();
-                }else {
-                    // Món ăn chưa được thêm vào danh sách yêu thích
-                    favoriteButton.setImageResource(R.drawable.ic_favorite);
-                    // Nếu món ăn chưa có trong danh sách yêu thích, thêm nó vào danh sách
-                    RecipeDetailsResponse favR = new RecipeDetailsResponse(response.id, response.title, response.image, response.sourceName, response.extendedIngredients, new ArrayList<>(),response.summary, "");
-                    myData.addRecipe(favR);
-                    //Thông báo
-                    Toast.makeText(RecipeDetailActivity.this, "Added to favorites", Toast.LENGTH_SHORT).show();
-                }
+                // Món ăn chưa được thêm vào danh sách yêu thích
+                favoriteButton.setImageResource(R.drawable.ic_favorite);
+                // Nếu món ăn chưa có trong danh sách yêu thích, thêm nó vào danh sách
+                RecipeDetailsResponse favR = new RecipeDetailsResponse(response.id, response.title, response.image, response.sourceName, response.extendedIngredients, new ArrayList<>(),response.summary, "");
+                myData.addRecipe(favR);
+                //Thông báo
+                Toast.makeText(RecipeDetailActivity.this, "Added to favorites", Toast.LENGTH_SHORT).show();
             });
         }
 
@@ -221,6 +245,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         public void didFetch(ArrayList<InstructionsReponse> reponse, String message) {
             myData.addInstructions(id, reponse);
 
+            //Hiển thị dữ liệu lên Recycler View
             recyler_meal_instructions.setHasFixedSize(true);
             recyler_meal_instructions.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.VERTICAL, false));
             instructionsAdapter = new InstructionsAdapter(RecipeDetailActivity.this, reponse);
