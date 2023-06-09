@@ -6,6 +6,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import ntu.nthuy.recipeapp.Model.InstructionsReponse;
 import ntu.nthuy.recipeapp.Model.RecipeDetailsResponse;
 
 public class FirebaseDatabaseHelper {
@@ -29,6 +30,10 @@ public class FirebaseDatabaseHelper {
         listId.add(recipe.id);
         myRef.setValue(recipe);
     }
+    public void addInstructions(int id, ArrayList<InstructionsReponse> reponse){
+        DatabaseReference myRef = mDatabase.child(String.valueOf(id)).child("instructionsReponses");
+        myRef.setValue(reponse);
+    }
 
     public void deleteRecipe(int recipeId) {
         DatabaseReference myRef = mDatabase.child(String.valueOf(recipeId));
@@ -37,7 +42,9 @@ public class FirebaseDatabaseHelper {
     }
 
     public boolean isFavorite(int id) {
-        return listId.contains(id);
+        if(mDatabase.child(String.valueOf(id)).getDatabase()!=null)
+            return false;
+        return true;
     }
 
 }

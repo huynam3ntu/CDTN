@@ -2,6 +2,7 @@ package ntu.nthuy.recipeapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +24,7 @@ import com.squareup.picasso.Picasso;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ntu.nthuy.recipeapp.Adapters.IngredientsAdapter;
@@ -41,6 +43,8 @@ import ntu.nthuy.recipeapp.MyFirebase.FirebaseDatabaseHelper;
 
 public class RecipeDetailActivity extends AppCompatActivity {
     int id;
+    private boolean fromMain;
+    private boolean fromFavorites;
     TextView textView_meal_name, textView_meal_source, textView_meal_summary;
     ImageView imageView_meal_image;
     RecyclerView recyler_meal_ingredients, recyler_meal_similar, recyler_meal_instructions;
@@ -51,9 +55,10 @@ public class RecipeDetailActivity extends AppCompatActivity {
     SimilarRecipesAdapter similarRecipesAdapter;
     InstructionsAdapter instructionsAdapter;
     ImageButton favoriteButton;
-    boolean isFavorite;
+    boolean isFavorite = false;
     FirebaseDatabaseHelper myData;
     private RecipeFavoriteDetailsListener recipeFavoriteDetailsListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,21 +66,33 @@ public class RecipeDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recipe_detail);
 
         findViews();
-
         id = Integer.parseInt(getIntent().getStringExtra("id"));
+        fromMain = getIntent().getBooleanExtra("fromMain", false);
+//        fromFavorites = getIntent().getBooleanExtra("fromFav", false);
 
-        myData = new FirebaseDatabaseHelper();
-        isFavorite = myData.isFavorite(id);
-        if(isFavorite){
-            loadRecipeDetails();
-            setRecipeFavoriteDetailsListener(recipeFavoriteDetailsListener);
-            showDetails();
+        if(fromMain){
+            Toast.makeText(RecipeDetailActivity.this, "NOT FAVORITE!!!!!!", Toast.LENGTH_SHORT).show();
 
-        }else{
             manager = new RequestManager(this);
             manager.getRecipeDetails(recipeDetailsListener, id);
             manager.getSimilarRecipes(similarRecipesListener, id);
             manager.getInstructions(instructionsListener, id);
+        } else {
+            favoriteButton.setImageResource(R.drawable.ic_edit_button);
+            Toast.makeText(RecipeDetailActivity.this, "FAVORITE!!!!!!", Toast.LENGTH_SHORT).show();
+            loadRecipeDetails();
+            setRecipeFavoriteDetailsListener(recipeFavoriteDetailsListener);
+            showDetails();
+            favoriteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(RecipeDetailActivity.this, String.valueOf(id), Toast.LENGTH_SHORT).show();
+//                    Intent intent = new Intent(RecipeDetailActivity.this, EditDetailsRecipeActivity.class);
+//                    intent.putExtra("fromFav", true);
+//                    intent.putExtra("id", id);
+//                    startActivity(intent);
+                }
+            });
         }
 
         builderDialog = new AlertDialog.Builder(this);
@@ -105,7 +122,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
     private void showDetails() {
         setRecipeFavoriteDetailsListener(response -> {
             dialog.dismiss();
-
+            Toast.makeText(this, String.valueOf(response.id), Toast.LENGTH_SHORT).show();
             favoriteButton.setImageResource(R.drawable.ic_favorite);
             textView_meal_name.setText(response.title);
 
@@ -123,7 +140,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
         });
     }
 
-
     public void setRecipeFavoriteDetailsListener(RecipeFavoriteDetailsListener listener) {
         this.recipeFavoriteDetailsListener = listener;
     }
@@ -137,6 +153,8 @@ public class RecipeDetailActivity extends AppCompatActivity {
         recyler_meal_similar = findViewById(R.id.recyler_meal_similar);
         recyler_meal_instructions = findViewById(R.id.recyler_meal_instructions);
         favoriteButton = findViewById(R.id.favorite_button);
+
+        myData = new FirebaseDatabaseHelper();
     }
 
     // Các bộ lắng nghe dữ liệu API
@@ -163,7 +181,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
                 if(isFavorite){
                     // Món ăn đã được thêm vào danh sách yêu thích
                     favoriteButton.setImageResource(R.drawable.ic_favorite_border);
-                    // Nếu món ăn đã có trong danh sách yêu thích, xóa nó khỏi danh sách
 
                     myData.deleteRecipe(response.id);
                     //Thông báo
@@ -172,7 +189,8 @@ public class RecipeDetailActivity extends AppCompatActivity {
                     // Món ăn chưa được thêm vào danh sách yêu thích
                     favoriteButton.setImageResource(R.drawable.ic_favorite);
                     // Nếu món ăn chưa có trong danh sách yêu thích, thêm nó vào danh sách
-                    myData.addRecipe(response);
+                    RecipeDetailsResponse favR = new RecipeDetailsResponse(response.id, response.title, response.image, response.sourceName, response.extendedIngredients, new ArrayList<>(),response.summary, "");
+                    myData.addRecipe(favR);
                     //Thông báo
                     Toast.makeText(RecipeDetailActivity.this, "Added to favorites", Toast.LENGTH_SHORT).show();
                 }
@@ -200,11 +218,14 @@ public class RecipeDetailActivity extends AppCompatActivity {
     };
     private final InstructionsListener instructionsListener = new InstructionsListener() {
         @Override
-        public void didFetch(List<InstructionsReponse> reponse, String message) {
+        public void didFetch(ArrayList<InstructionsReponse> reponse, String message) {
+            myData.addInstructions(id, reponse);
+
             recyler_meal_instructions.setHasFixedSize(true);
             recyler_meal_instructions.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.VERTICAL, false));
             instructionsAdapter = new InstructionsAdapter(RecipeDetailActivity.this, reponse);
             recyler_meal_instructions.setAdapter(instructionsAdapter);
+
         }
         @Override
         public void didError(String message) {

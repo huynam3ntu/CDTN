@@ -109,6 +109,10 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private final  RecipeClickedListener recipeClickedListener = id -> startActivity(new Intent(MainActivity.this, RecipeDetailActivity.class)
-            .putExtra("id", id));
+    private final RecipeClickedListener recipeClickedListener = id -> {
+        Intent intent = new Intent(MainActivity.this, RecipeDetailActivity.class);
+        intent.putExtra("fromMain", true);
+        intent.putExtra("id", id);
+        startActivity(intent);
+    };
 }

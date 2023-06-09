@@ -8,4 +8,12 @@ public class Step {
     public ArrayList<Ingredient> ingredients;
     public ArrayList<Equipment> equipment;
     public Length length;
+
+    public Step() {
+    }
+
+    public Step(int number, String step) {
+        this.number = number;
+        this.step = step;
+    }
 }

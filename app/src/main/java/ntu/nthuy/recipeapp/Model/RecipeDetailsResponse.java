@@ -8,18 +8,20 @@ public class RecipeDetailsResponse {
     public String image;
     public String sourceName;
     public ArrayList<ExtendedIngredient> extendedIngredients;
+    public ArrayList<InstructionsReponse> instructionsReponses;
     public String summary;
     public String note;
 
     public RecipeDetailsResponse() {
     }
 
-    public RecipeDetailsResponse(int id, String title, String image, String sourceName, ArrayList<ExtendedIngredient> extendedIngredients, String summary, String note) {
+    public RecipeDetailsResponse(int id, String title, String image, String sourceName, ArrayList<ExtendedIngredient> extendedIngredients, ArrayList<InstructionsReponse> instructionsReponses, String summary, String note) {
         this.id = id;
         this.title = title;
         this.image = image;
         this.sourceName = sourceName;
         this.extendedIngredients = extendedIngredients;
+        this.instructionsReponses = instructionsReponses;
         this.summary = summary;
         this.note = note;
     }
@@ -64,6 +66,14 @@ public class RecipeDetailsResponse {
         this.extendedIngredients = extendedIngredients;
     }
 
+    public ArrayList<InstructionsReponse> getInstructionsReponses() {
+        return instructionsReponses;
+    }
+
+    public void setInstructionsReponses(ArrayList<InstructionsReponse> instructionsReponses) {
+        this.instructionsReponses = instructionsReponses;
+    }
+
     public String getSummary() {
         return summary;
     }
@@ -79,4 +89,5 @@ public class RecipeDetailsResponse {
     public void setNote(String note) {
         this.note = note;
     }
+
 }

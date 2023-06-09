@@ -24,6 +24,14 @@ public class InstructionStepAdapter extends RecyclerView.Adapter<InstructionStep
         this.context = context;
         this.list = list;
     }
+    public List<Step> getSteps() {
+        return list;
+    }
+    public void addStep(Step step) {
+
+        list.add(step);
+        notifyItemInserted(list.size() - 1);
+    }
 
     @NonNull
     @Override

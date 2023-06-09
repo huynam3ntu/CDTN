@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditDetailsRecipeActivity"
+    android:orientation="vertical">
+    <EditText
+        android:id="@+id/edt_edit_title"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:hint="Title"
+        android:inputType="text"
+        android:textSize="24sp"
+        android:autofillHints="name"
+        android:textColor="@color/black"/>
+
+    <EditText
+        android:id="@+id/edt_edit_image"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:hint="Image URL"
+        android:inputType="text"
+        android:textSize="24sp"
+        android:autofillHints="name"
+        android:textColor="@color/black"/>
+
+    <EditText
+        android:id="@+id/edt_edit_source_name"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:hint="Source Name"
+        android:inputType="text"
+        android:textSize="24sp"
+        android:autofillHints="name"
+        android:textColor="@color/black"/>
+
+    <!-- Hiển thị danh sách các ExtendedIngredient -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_Edit_extended_ingredients"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <!-- Hiển thị danh sách các InstructionsResponse -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_Edit_instructions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/summary_edit_text"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:hint="Summary"
+        android:inputType="text"
+        android:textSize="24sp"
+        android:autofillHints="name"
+        android:textColor="@color/black"/>
+
+    <EditText
+        android:id="@+id/note_edit_text"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:hint="Note"
+        android:inputType="text"
+        android:textSize="24sp"
+        android:autofillHints="name"
+        android:textColor="@color/black"/>
+
+    <Button
+        android:id="@+id/save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="Save" />
+
+</LinearLayout>

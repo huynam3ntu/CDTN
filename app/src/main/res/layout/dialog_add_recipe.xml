@@ -6,6 +6,14 @@
     android:orientation="vertical"
     android:padding="16dp">
     <EditText
+        android:id="@+id/edt_dialogFav_image"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        tools:ignore="HardcodedText"
+        android:inputType="text"
+        android:autofillHints="Meal Image"/>
+    <EditText
         android:id="@+id/edt_dialogFav_title"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
@@ -57,14 +65,22 @@
         android:id="@+id/recyler_ingredients_fav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
-
-    <ImageView
-        android:id="@+id/imageView_dialogFav_meal"
-        android:src="@drawable/choose_img"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:contentDescription="Meal Image"
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Instructions"
+        android:textSize="18sp"
+        android:textStyle="bold"
         tools:ignore="HardcodedText" />
+    <Button
+        android:id="@+id/button_add_step"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Step"
+        tools:ignore="HardcodedText" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyler_instructions_fav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

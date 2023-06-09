@@ -42,7 +42,8 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesViewHolder>{
             holder.item_favorite_number.setText(String.valueOf(position + 1));
             Picasso.get().load(fav.image).into(holder.item_favorite_image);
             holder.item_favorite_name.setText(fav.title);
-            holder.list_favorites.setOnClickListener(v -> clickedListener.onRecipeClicked(String.valueOf(fav.id)));
+            holder.list_favorites.setOnClickListener(v ->
+                    clickedListener.onRecipeClicked(String.valueOf(listFav.get(holder.getAdapterPosition()).id)));
         }
     }
 

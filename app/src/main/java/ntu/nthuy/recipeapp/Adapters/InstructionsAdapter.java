@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import ntu.nthuy.recipeapp.Model.InstructionsReponse;
 import ntu.nthuy.recipeapp.R;
@@ -18,11 +18,18 @@ import ntu.nthuy.recipeapp.R;
 public class InstructionsAdapter extends RecyclerView.Adapter<InstructionsViewHolder>{
 
     Context context;
-    List<InstructionsReponse> list;
+    ArrayList<InstructionsReponse> list;
 
-    public InstructionsAdapter(Context context, List<InstructionsReponse> list) {
+    public InstructionsAdapter(Context context, ArrayList<InstructionsReponse> list) {
         this.context = context;
         this.list = list;
+    }
+    public ArrayList<InstructionsReponse> getInstructions() {
+        return list;
+    }
+    public void addSteps(InstructionsReponse reponse) {
+        list.add(reponse);
+        notifyItemInserted(list.size() - 1);
     }
 
     @NonNull

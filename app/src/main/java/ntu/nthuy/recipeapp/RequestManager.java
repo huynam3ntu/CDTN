@@ -2,6 +2,7 @@ package ntu.nthuy.recipeapp;
 
 import android.content.Context;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ntu.nthuy.recipeapp.Listeners.InstructionsListener;
@@ -100,7 +101,7 @@ public class RequestManager {
                     listener.didError(response.message());
                     return;
                 }
-                listener.didFetch(response.body(), response.message());
+                listener.didFetch((ArrayList<InstructionsReponse>) response.body(), response.message());
             }
 
             @Override

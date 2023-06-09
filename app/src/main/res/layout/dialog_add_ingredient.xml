@@ -18,10 +18,12 @@
         android:hint="Original/Much"
         android:autofillHints="much"
         android:inputType="text"/>
-    <ImageView
-        android:id="@+id/imageView_dialogAdd"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:contentDescription="imageIngredient"/>
+    <EditText
+        android:id="@+id/edt_dialogIngredient_image"
+        android:layout_width="350dp"
+        android:layout_height="60dp"
+        android:hint="Image File Name"
+        android:autofillHints="file name"
+        android:inputType="text"/>
 
 </LinearLayout>
