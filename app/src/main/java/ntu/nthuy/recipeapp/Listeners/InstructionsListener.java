@@ -5,6 +5,6 @@ import java.util.ArrayList;
 import ntu.nthuy.recipeapp.Model.InstructionsReponse;
 
 public interface InstructionsListener {
-    void didFetch(ArrayList<InstructionsReponse> reponse, String message);
-    void didError(String message);
+    void fetch(ArrayList<InstructionsReponse> reponse, String message);
+    void err(String message);
 }

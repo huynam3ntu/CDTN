@@ -10,20 +10,23 @@
         android:layout_height="60dp"
         android:hint="Name"
         android:inputType="text"
-        android:autofillHints="name" />
+        android:autofillHints="name"
+        android:textColor="@color/white"/>
     <EditText
         android:id="@+id/edt_dialogIngredient_original"
         android:layout_width="350dp"
         android:layout_height="60dp"
         android:hint="Original/Much"
         android:autofillHints="much"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:textColor="@color/white"/>
     <EditText
         android:id="@+id/edt_dialogIngredient_image"
         android:layout_width="350dp"
         android:layout_height="60dp"
         android:hint="Image File Name"
         android:autofillHints="file name"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:textColor="@color/white"/>
 
 </LinearLayout>

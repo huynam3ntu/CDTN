@@ -4,35 +4,25 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import ntu.nthuy.recipeapp.Model.InstructionsReponse;
 import ntu.nthuy.recipeapp.Model.RecipeDetailsResponse;
 
 public class FirebaseDatabaseHelper {
+    //  Tham chiếu đến nút "recipes" trong Firebase Realtime Database
     private   DatabaseReference mDatabase;
-    private final List<Integer> listId = new ArrayList<>();
-
+    // Khởi tạo
     public FirebaseDatabaseHelper() {
         mDatabase = FirebaseDatabase.getInstance().getReference("recipes");
     }
-
-    public DatabaseReference getmDatabase() {
-        return mDatabase;
-    }
-
-    public List<Integer> getListId() {
-        return listId;
-    }
-
+    // Thêm một đối tượng RecipeDetailsResponse mới
     public void addRecipe(RecipeDetailsResponse recipe) {
         DatabaseReference myRef = mDatabase.child(String.valueOf(recipe.id));
-        listId.add(recipe.id);
         myRef.setValue(recipe);
     }
+    // Thêm danh sách các bước hướng dẫn nấu ăn
     public void addInstructions(int id, ArrayList<InstructionsReponse> reponse){
         DatabaseReference myRef = mDatabase.child(String.valueOf(id)).child("instructionsReponses");
         myRef.setValue(reponse);
     }
-
 }

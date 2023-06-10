@@ -44,21 +44,30 @@ import ntu.nthuy.recipeapp.MyFirebase.FirebaseDatabaseHelper;
 
 
 public class RecipeDetailActivity extends AppCompatActivity {
+    // Một số nguyên lưu trữ ID của công thức nấu ăn được chọn để xem chi tiết
     int id;
-    private boolean fromMain;
-    private boolean fromFavorites;
-    TextView textView_meal_name, textView_meal_source, textView_meal_summary;
-    ImageView imageView_meal_image;
-    RecyclerView recyler_meal_ingredients, recyler_meal_similar, recyler_meal_instructions;
+    // Các thành phần công thức nấu ăn
+    TextView txtView_detail_title, txtView_detail_source, txtView_detail_summary;
+    ImageView imgView_detail_image;
+    // Hiện nguyên liệu, công thức nấu ăn tương tự, và hướng dẫn nấu ăn
+    RecyclerView recyler_detail_ingredient, recyler_detail_similar, recyler_detail_instruction;
+    // Sử dụng lớp RequestManager đã được định nghĩa để gọi các phương thức xử lý đối với API
     RequestManager manager;
+    // Hiển thị hộp thoại
     AlertDialog.Builder builderDialog;
-    AlertDialog dialog;
+    AlertDialog myDialog;
+    // Các lớp adapter tùy chỉnh để xử lý việc hiển thị danh sách các thành phần,
+    // Công thức nấu ăn tương tự, và hướng dẫn nấu ăn cho công thức được chọn
     IngredientsAdapter ingredientsAdapter;
     SimilarRecipesAdapter similarRecipesAdapter;
     InstructionsAdapter instructionsAdapter;
-    ImageButton favoriteButton, deleteButton;
-    boolean isFavorite = false;
+    // Các ImageButton để cho phép người dùng thêm, sửa, xóa
+    ImageButton favoriteButton, delButton;
+    // Sử dụng FirebaseDatabaseHelper đã được định nghĩa,
+    // để thêm và xóa công thức nấu ăn khỏi danh sách yêu thích
     FirebaseDatabaseHelper myData;
+    // một giao diện (interface) để lắng nghe sự kiện khi người dùng
+    // thêm hoặc xóa công thức nấu ăn khỏi danh sách yêu thích
     private RecipeFavoriteDetailsListener recipeFavoriteDetailsListener;
 
 
@@ -67,197 +76,232 @@ public class RecipeDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
 
+        // Gọi phương thức findViews
+        // Tìm và ánh xạ views
         findViews();
+        // Một số nguyên lưu trữ ID của công thức nấu ăn được chọn để xem chi tiết,
+        // được lấy từ Intent
         id = Integer.parseInt(getIntent().getStringExtra("id"));
-        fromMain = getIntent().getBooleanExtra("fromMain", false);
-//        fromFavorites = getIntent().getBooleanExtra("fromFav", false);
+        // Biến boolean xác định xem công thức nấu ăn được chọn để xem chi tiết
+        // có từ màn hình chính MainActivity hay từ màn hình yêu thích FavoritesActivity
+        boolean fromMain = getIntent().getBooleanExtra("fromMain", false);
 
         if(fromMain){
-            Toast.makeText(RecipeDetailActivity.this, "NOT FROM FAVORITE!!!!!!", Toast.LENGTH_SHORT).show();
-
+            // Nếu công thức nấu ăn được chọn để xem chi tiết từ màn hình chính
+            Toast.makeText(RecipeDetailActivity.this, "Công thức mới!"
+                    , Toast.LENGTH_SHORT).show();
+            delButton.setVisibility(View.GONE); //Ẩn nút deleteButton
+            //Tạo một đối tượng RequestManager để quản lý các yêu cầu API
+            // và xử lý dữ liệu trả về
             manager = new RequestManager(this);
-            manager.getRecipeDetails(recipeDetailsListener, id);
-            manager.getSimilarRecipes(similarRecipesListener, id);
+            // Tải thông tin chi tiết công thức nấu ăn được chọn
+            manager.getRecipeDetails(detailsListener, id);
+            // Tải danh sách các công thức nấu ăn tương tự
+            manager.getSimilar(similarsListener, id);
+            // Tải hướng dẫn nấu ăn cho công thức được chọn
             manager.getInstructions(instructionsListener, id);
         } else {
-            Toast.makeText(RecipeDetailActivity.this, "FROM FAVORITE!!!!!!", Toast.LENGTH_SHORT).show();
+            // Tải thông tin chi tiết của công thức nấu ăn từ Firebase Realtime Database
             loadRecipeDetails();
+            // Lắng nghe sự kiện khi người dùng thêm hoặc xóa công thức nấu ăn
+            // khỏi danh sách yêu thích
             setRecipeFavoriteDetailsListener(recipeFavoriteDetailsListener);
+            // Hiển thị thông tin chi tiết của công thức nấu ăn
             showDetails();
         }
-
+        // Hiển thị một hộp thoại thông báo khi đang tải thông tin chi tiết của công thức nấu ăn
         builderDialog = new AlertDialog.Builder(this);
         builderDialog.setMessage("Loading Details...");
         builderDialog.setCancelable(false);
-        dialog = builderDialog.create();
-        dialog.show();
+        myDialog = builderDialog.create();
+        myDialog.show();
     }
     private void loadRecipeDetails() {
+        // truy cập vào nút "recipes"
+        // và lấy công thức nấu ăn có ID tương ứng với id
         DatabaseReference recipeRef = FirebaseDatabase.getInstance().getReference("recipes").child(String.valueOf(id));
         recipeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            // Lắng nghe sự kiện khi dữ liệu được lấy từ Firebase Realtime Database
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Tạo đối tượng RecipeDetailsResponse lấy từ Firebase Realtime Database
                 RecipeDetailsResponse recipeDetailsResponse = snapshot.getValue(RecipeDetailsResponse.class);
                 if (recipeDetailsResponse != null) {
                     // Nếu có đối tượng trả về, thì sẽ truyền đối tượng cho bộ lắng nghe
-                    recipeFavoriteDetailsListener.didFetch(recipeDetailsResponse);
+                    recipeFavoriteDetailsListener.fetch(recipeDetailsResponse);
                 }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // err
             }
         });
     }
     private void showDetails() {
         setRecipeFavoriteDetailsListener(response -> {
-            dialog.dismiss();
-            Toast.makeText(this, String.valueOf(response.id), Toast.LENGTH_SHORT).show();
-
+            myDialog.dismiss(); // Ẩn hộp thoại
+            delButton.setVisibility(View.VISIBLE); //Hiện nút deleteButton
+            // Hiển thị nút Edit cho phép người dùng chỉnh sửa
             favoriteButton.setImageResource(R.drawable.ic_edit_button);
-
-            textView_meal_name.setText(response.title);
+            // Hiển thị tên món ăn
+            txtView_detail_title.setText(response.title);
+            // Hiển thị nội dung giới thiệu món ăn
             Document doc = Jsoup.parse(response.summary);
             String rpsummary = doc.text();
-            textView_meal_summary.setText(rpsummary);
-            textView_meal_source.setText(response.sourceName);
-            Picasso.get().load(response.image).into(imageView_meal_image);
+            txtView_detail_summary.setText(rpsummary);
+            // Hiển thị nguồn
+            txtView_detail_source.setText(response.sourceName);
+            // Hiển thị ảnh món ăn
+            Picasso.get().load(response.image).into(imgView_detail_image);
 
-            //Hiển thị dữ liệu lên Recycler View
-            recyler_meal_ingredients.setHasFixedSize(true);
-            recyler_meal_ingredients.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
+            //Hiển thị dữ liệu nguyên lịệu ingredients lên Recycler View
+            recyler_detail_ingredient.setHasFixedSize(true);
+            recyler_detail_ingredient.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
             ingredientsAdapter = new IngredientsAdapter(RecipeDetailActivity.this, response.extendedIngredients);
-            recyler_meal_ingredients.setAdapter(ingredientsAdapter);
+            recyler_detail_ingredient.setAdapter(ingredientsAdapter);
 
             //Hiển thị dữ liệu lên Recycler View -- đang bị lỗi
-//            recyler_meal_instructions.setHasFixedSize(true);
-//            recyler_meal_instructions.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.VERTICAL, false));
+//            recyler_detail_instruction.setHasFixedSize(true);
+//            recyler_detail_instruction.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.VERTICAL, false));
 //            instructionsAdapter = new InstructionsAdapter(RecipeDetailActivity.this, response.instructionsReponses);
-//            recyler_meal_instructions.setAdapter(instructionsAdapter);
+//            recyler_detail_instruction.setAdapter(instructionsAdapter);
 
-            favoriteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(RecipeDetailActivity.this, String.valueOf(id), Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(RecipeDetailActivity.this, EditDetailsRecipeActivity.class);
-                    intent.putExtra("fromDetailFav", true);
-                    intent.putExtra("id", String.valueOf(id));
-                    startActivity(intent);
-                }
+            // Khi người dùng nhấn nút Edit
+            favoriteButton.setOnClickListener(v -> {
+                // Tạo chuyển hướng người dùng đến EditDetailsRecipeActivity
+                Intent myIntent = new Intent(RecipeDetailActivity.this
+                        , EditDetailsRecipeActivity.class);
+                // Các thông tin được truyền qua Intent
+                // để hỗ trợ xử lý trên màn hình EditDetailsRecipeActivity
+                myIntent.putExtra("fromDetailFav", true);
+                myIntent.putExtra("recipeId", String.valueOf(id));
+                startActivity(myIntent);
             });
-            deleteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(RecipeDetailActivity.this);
-                    builder.setMessage("Are you sure you want to delete?");
-                    builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Thực hiện xóa đối tượng RecipeDetailsResponse trên Firebase Realtime
-                            DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("recipes").child(String.valueOf(id));
-                            myRef.removeValue(new DatabaseReference.CompletionListener() {
-                                @Override
-                                public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                                    Toast.makeText(RecipeDetailActivity.this, "Delete completed!", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            finish();
-                        }
-                    });
-                    builder.setNegativeButton("Cancel", null);
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
-                }
+            // Khi người dùng nhấn nút Delete
+            delButton.setOnClickListener(v -> {
+                // Hiển thị hộp thoại nhắc nhở, xác nhận hành động xóa
+                AlertDialog.Builder myBuilder = new AlertDialog.Builder(RecipeDetailActivity.this);
+                myBuilder.setMessage("Muốn xóa công thức này thật chứ?");
+                myBuilder.setPositiveButton("Xóa", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Thực hiện xóa đối tượng RecipeDetailsResponse
+                        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("recipes").child(String.valueOf(id));
+                        myRef.removeValue(new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                                Toast.makeText(RecipeDetailActivity.this, "Xóa thành công!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        finish(); // Trở lại màn hình trước
+                    }
+                });
+                myBuilder.setNegativeButton("Hủy", null);
+                AlertDialog alertDialog = myBuilder.create();
+                alertDialog.show();
             });
         });
     }
-
+    //
     public void setRecipeFavoriteDetailsListener(RecipeFavoriteDetailsListener listener) {
         this.recipeFavoriteDetailsListener = listener;
     }
-
+    // Tìm và ánh xạ
     private void findViews() {
-        textView_meal_name = findViewById(R.id.textView_meal_name);
-        textView_meal_source = findViewById(R.id.textView_meal_source);
-        textView_meal_summary = findViewById(R.id.textView_meal_summary);
-        imageView_meal_image = findViewById(R.id.imageView_meal_image);
-        recyler_meal_ingredients = findViewById(R.id.recyler_meal_ingredients);
-        recyler_meal_similar = findViewById(R.id.recyler_meal_similar);
-        recyler_meal_instructions = findViewById(R.id.recyler_meal_instructions);
+        txtView_detail_title = findViewById(R.id.txtView_detail_title);
+        txtView_detail_source = findViewById(R.id.txtView_detail_source);
+        txtView_detail_summary = findViewById(R.id.txtView_detail_summary);
+        imgView_detail_image = findViewById(R.id.imgView_detail_image);
+        recyler_detail_ingredient = findViewById(R.id.recyler_detail_ingredient);
+        recyler_detail_similar = findViewById(R.id.recyler_detail_similar);
+        recyler_detail_instruction = findViewById(R.id.recyler_detail_instruction);
         favoriteButton = findViewById(R.id.favorite_button);
-        deleteButton = findViewById(R.id.favorite_delete_button);
+        delButton = findViewById(R.id.favorite_delButton);
 
         myData = new FirebaseDatabaseHelper();
     }
 
     // Các bộ lắng nghe dữ liệu API
-    private final RecipeDetailsListener recipeDetailsListener = new RecipeDetailsListener() {
+    private final RecipeDetailsListener detailsListener = new RecipeDetailsListener() {
         @Override
-        public void didFetch(RecipeDetailsResponse response, String message) {
-            dialog.dismiss();
-
+        public void fetch(RecipeDetailsResponse response, String message) {
+            myDialog.dismiss(); // Ẩn hộp thoại loading
+            // Thiết lập ảnh cho nút favoriteButton
             favoriteButton.setImageResource(R.drawable.ic_favorite_border);
-            textView_meal_name.setText(response.title);
+            // Lấy dữ liệu từ API
+            // tên
+            txtView_detail_title.setText(response.title);
+            // Hiển thị nội dung giới thiệu
             Document doc = Jsoup.parse(response.summary);
             String rpsummary = doc.text();
-            textView_meal_summary.setText(rpsummary);
-
-            textView_meal_source.setText(response.sourceName);
-            Picasso.get().load(response.image).into(imageView_meal_image);
-
-            recyler_meal_ingredients.setHasFixedSize(true);
-            recyler_meal_ingredients.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
+            txtView_detail_summary.setText(rpsummary);
+            // Hiển thị nguồn
+            txtView_detail_source.setText(response.sourceName);
+            // Hiển thị ảnh món ăn
+            Picasso.get().load(response.image).into(imgView_detail_image);
+            // Hiển thị danh sách các nguyên liệu
+            recyler_detail_ingredient.setHasFixedSize(true);
+            recyler_detail_ingredient.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
             ingredientsAdapter = new IngredientsAdapter(RecipeDetailActivity.this, response.extendedIngredients);
-            recyler_meal_ingredients.setAdapter(ingredientsAdapter);
-
+            recyler_detail_ingredient.setAdapter(ingredientsAdapter);
+            // Thiết lập khi người dùng nhất nút favoriteButton
             favoriteButton.setOnClickListener(v -> {
-                // Món ăn chưa được thêm vào danh sách yêu thích
+                // Thiết lập ảnh favoriteButton đổi sang trạng thái "đã thích"
                 favoriteButton.setImageResource(R.drawable.ic_favorite);
-                // Nếu món ăn chưa có trong danh sách yêu thích, thêm nó vào danh sách
+                // Thêm món ăn vào danh sách yêu thích
                 RecipeDetailsResponse favR = new RecipeDetailsResponse(response.id, response.title, response.image, response.sourceName, response.extendedIngredients, new ArrayList<>(),response.summary, "");
+                // Sử dụng phương thức addRecipe trong lớp FirebaseDatabaseHelper
+                // để thêm món ăn vào danh sách yêu thích trên Firebase Realtime Database
                 myData.addRecipe(favR);
-                //Thông báo
-                Toast.makeText(RecipeDetailActivity.this, "Added to favorites", Toast.LENGTH_SHORT).show();
+                //Hiển thị thông báo
+                Toast.makeText(RecipeDetailActivity.this, "Đã thêm vào danh sách yêu thích", Toast.LENGTH_SHORT).show();
             });
         }
 
         @Override
-        public void didError(String message) {
-            Toast.makeText(RecipeDetailActivity.this, message, Toast.LENGTH_SHORT).show();
+        public void err(String message) {
+            // Khi dữ liệu API không trả về được
+
         }
     };
-    private final SimilarRecipesListener similarRecipesListener = new SimilarRecipesListener() {
+    // Đối tượng similarRecipesListener lắng nghe sự kiện
+    // khi danh sách các công thức nấu ăn tương tự được tải từ API
+    private final SimilarRecipesListener similarsListener = new SimilarRecipesListener() {
         @Override
-        public void didFetch(List<SimilarRecipesResponse> response, String message) {
-            recyler_meal_similar.setHasFixedSize(true);
-            recyler_meal_similar.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
+        public void fetch(List<SimilarRecipesResponse> response, String message) {
+            // Tải thành công từ API
+            // Thiết lập để hiển thị danh sách các công thức nấu ăn tương tự
+            recyler_detail_similar.setHasFixedSize(true);
+            recyler_detail_similar.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.HORIZONTAL, false));
             similarRecipesAdapter = new SimilarRecipesAdapter(RecipeDetailActivity.this, response, recipeClickedListener);
-            recyler_meal_similar.setAdapter(similarRecipesAdapter);
+            recyler_detail_similar.setAdapter(similarRecipesAdapter);
         }
 
         @Override
-        public void didError(String message) {
-            Toast.makeText(RecipeDetailActivity.this, message, Toast.LENGTH_SHORT).show();
+        public void err(String message) {
+            //Khi err
         }
     };
+    // Đối tượng instructionsListener lắng nghe sự kiện
+    // khi hướng dẫn nấu ăn của công thức được tải từ API
     private final InstructionsListener instructionsListener = new InstructionsListener() {
         @Override
-        public void didFetch(ArrayList<InstructionsReponse> reponse, String message) {
+        public void fetch(ArrayList<InstructionsReponse> reponse, String message) {
+            // Tải thành công từ API
             myData.addInstructions(id, reponse);
-
             //Hiển thị dữ liệu lên Recycler View
-            recyler_meal_instructions.setHasFixedSize(true);
-            recyler_meal_instructions.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.VERTICAL, false));
+            recyler_detail_instruction.setHasFixedSize(true);
+            recyler_detail_instruction.setLayoutManager(new LinearLayoutManager(RecipeDetailActivity.this, LinearLayoutManager.VERTICAL, false));
             instructionsAdapter = new InstructionsAdapter(RecipeDetailActivity.this, reponse);
-            recyler_meal_instructions.setAdapter(instructionsAdapter);
-
+            recyler_detail_instruction.setAdapter(instructionsAdapter);
         }
         @Override
-        public void didError(String message) {
-            Toast.makeText(RecipeDetailActivity.this, message, Toast.LENGTH_SHORT).show();
+        public void err(String message) {
+            // Khi err
         }
     };
+    // Đối tượng recipeClickedListener lắng nghe các công thức nấu ăn tương tự
+    //  trên màn hình xem chi tiết công thức nấu ăn
     private final RecipeClickedListener recipeClickedListener = id -> startActivity(new Intent(RecipeDetailActivity.this, RecipeDetailActivity.class)
             .putExtra("id", id));
-
 }

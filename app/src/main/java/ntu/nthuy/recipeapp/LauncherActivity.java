@@ -8,8 +8,7 @@ import android.os.Looper;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class LauncherActivity extends AppCompatActivity {
-    private static final int SPLASH_SCREEN_TIMEOUT = 2000; // 2 seconds
-
+    private static final int SPLASH_SCREEN_TIMEOUT = 3000; // 3 seconds
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,12 +17,10 @@ public class LauncherActivity extends AppCompatActivity {
             @Override
             public void run() {
                 // Thực hiện tác vụ sau khi delay
-                Intent intent = new Intent(LauncherActivity.this, FavoritesActivity.class);
-                startActivity(intent);
-                finish(); // Kết thúc `LauncherActivity` để ngăn không cho người dùng quay lại
+                startActivity(new Intent(LauncherActivity.this, MainActivity.class));
+                finish(); // Kết thúc để ngăn không cho người dùng quay lại
                 // màn hình này bằng cách sử dụng nút back.
             }
-
         }, SPLASH_SCREEN_TIMEOUT);
     }
 }

@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"/>
             <Spinner
-                android:id="@+id/spinner_tags"
+                android:id="@+id/drop_tags"
                 android:gravity="center"
                 android:layout_alignParentEnd="true"
                 android:entries="@array/tags"
@@ -60,7 +60,7 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyler_random"
+        android:id="@+id/recylerView_random"
         android:layout_margin="4dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

@@ -26,7 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
-                    android:id="@+id/textView_meal_name"
+                    android:id="@+id/txtView_detail_title"
                     android:textSize="20sp"
                     android:text="Recipe Name/Tên món ăn"
                     android:gravity="left"
@@ -48,7 +48,7 @@
                         android:background="@android:color/transparent"
                         android:contentDescription="Thích/Likes"/>
                     <ImageButton
-                        android:id="@+id/favorite_delete_button"
+                        android:id="@+id/favorite_delButton"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:src="@drawable/ic_delete_recipe"
@@ -60,7 +60,7 @@
 
             </LinearLayout>
             <TextView
-                android:id="@+id/textView_meal_source"
+                android:id="@+id/txtView_detail_source"
                 android:text="Source/Nguồn"
                 android:gravity="center"
                 android:textStyle="italic"
@@ -70,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <ImageView
-                android:id="@+id/imageView_meal_image"
+                android:id="@+id/imgView_detail_image"
                 android:layout_margin="8dp"
                 android:scaleType="centerCrop"
                 android:layout_width="match_parent"
@@ -86,7 +86,7 @@
                 android:textStyle="normal"
                 android:textAlignment="center"/>
             <TextView
-                android:id="@+id/textView_meal_summary"
+                android:id="@+id/txtView_detail_summary"
                 android:text="Summary/Giới Thiệu"
                 android:textSize="14sp"
                 android:textColor="@color/white"
@@ -96,7 +96,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyler_meal_instructions"
+                android:id="@+id/recyler_detail_instruction"
                 android:layout_margin="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -110,7 +110,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyler_meal_similar"
+                android:id="@+id/recyler_detail_similar"
                 android:layout_margin="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -124,7 +124,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyler_meal_ingredients"
+                android:id="@+id/recyler_detail_ingredient"
                 android:layout_margin="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>

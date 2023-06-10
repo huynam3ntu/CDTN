@@ -23,95 +23,114 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public class RequestManager {
+    // Một đối tượng Context để lấy giá trị của api_key
+    // bằng phương thức `getString() từ tệp strings.xml
     Context context;
-    Retrofit retrofit = new Retrofit.Builder()
+    // Một đối tượng Retrofit được sử dụng để tạo ra các yêu cầu API đến Spoonacular API
+    Retrofit myRetrofit = new Retrofit.Builder()
             .baseUrl(" https://api.spoonacular.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
-
+    // Phương thức khởi tạo: sử dụng trong việc lấy giá trị của api_key
     public RequestManager(Context context) {
         this.context = context;
     }
-
+    // Để lấy danh sách các công thức nấu ăn ngẫu nhiên từ Spoonacular API
+    // nhận vào một đối tượng RandomRecipeResponseListener để lắng nghe kết quả trả về
+    // và một danh sách các tag để lọc kết quả trả về
     public void getRandomRecipes(RandomRecipeResponseListener listener, List<String> tags){
-        CallRandomRecipes callRandomRecipes = retrofit.create(CallRandomRecipes.class);
-        Call<RandomRecipeApiResponse> call = callRandomRecipes.callRandomRecipe(context.getString(R.string.api_key), "20", tags);
-        call.enqueue(new Callback<RandomRecipeApiResponse>() {
+        // Tạo ra một yêu cầu API đến Spoonacular API
+        CallRandoms callRandom = myRetrofit.create(CallRandoms.class);
+        Call<RandomRecipeApiResponse> myCall = callRandom.callRandomRecipe(context.getString(R.string.api_key), "20", tags);
+        // gọi phương thức enqueue() để thực hiện yêu cầu này bất đồng bộ
+        myCall.enqueue(new Callback<RandomRecipeApiResponse>() {
             @Override
             public void onResponse(Call<RandomRecipeApiResponse> call, Response<RandomRecipeApiResponse> response){
-                if(response.isSuccessful())
-                    listener.didFetch(response.body(), response.message());
-                else{
-                    listener.didError(response.message());
+                if(!response.isSuccessful()){
+                    // yêu cầu API KHÔNG thành công
+                    listener.err(response.message());
                     return;
                 }
+                    listener.fetch(response.body(), response.message());
             }
-
             @Override
             public void onFailure(Call<RandomRecipeApiResponse> call, Throwable t) {
-                listener.didError(t.getMessage());
+                listener.err(t.getMessage());
             }
         });
     }
+    // Lắng nghe kết quả trả về từ API và một id
+    // để xác định công thức nấu ăn cần lấy thông tin chi tiết
     public void getRecipeDetails(RecipeDetailsListener listener, int id){
-        CallRecipeDetails callRecipeDetails = retrofit.create(CallRecipeDetails.class);
-        Call<RecipeDetailsResponse> call = callRecipeDetails.callRecipeDetails(id, context.getString(R.string.api_key));
-        call.enqueue(new Callback<RecipeDetailsResponse>() {
+        // Tạo ra một yêu cầu API đến Spoonacular API
+        CallDetails callDetails = myRetrofit.create(CallDetails.class);
+        Call<RecipeDetailsResponse> myCall = callDetails.callRecipeDetails(id, context.getString(R.string.api_key));
+        // Thực hiện yêu cầu này bất đồng bộ
+        myCall.enqueue(new Callback<RecipeDetailsResponse>() {
             @Override
             public void onResponse(Call<RecipeDetailsResponse> call, Response<RecipeDetailsResponse> response) {
-                if(!response.isSuccessful()){
-                    listener.didError(response.message());
+                if(response.isSuccessful()){
+                    // yêu cầu API thành công
+                    listener.fetch(response.body(), response.message());
                     return;
                 }
-                listener.didFetch(response.body(), response.message());
+                listener.err(response.message());
             }
-
             @Override
             public void onFailure(Call<RecipeDetailsResponse> call, Throwable t) {
-                listener.didError(t.getMessage());
+                listener.err(t.getMessage());
             }
         });
     }
-    public void getSimilarRecipes(SimilarRecipesListener listener, int id){
-        CallSimilarRecipes callSimilarRecipes = retrofit.create(CallSimilarRecipes.class);
-        Call<List<SimilarRecipesResponse>> call = callSimilarRecipes.callSimilarRecipes(id, "10", context.getString(R.string.api_key));
-        call.enqueue(new Callback<List<SimilarRecipesResponse>>() {
+    // Phương thức này nhận vào một đối tượng SimilarRecipesListener
+    // để lắng nghe kết quả trả về từ API và một id
+    // để xác định các công thức nấu ăn tương tự
+    public void getSimilar(SimilarRecipesListener listener, int id){
+        // Tạo ra một yêu cầu API đến Spoonacular API
+        CallSimilars callSimilar = myRetrofit.create(CallSimilars.class);
+        Call<List<SimilarRecipesResponse>> myCall = callSimilar.callSimilarRecipes(id, "10", context.getString(R.string.api_key));
+        // Thực hiện yêu cầu này bất đồng bộ
+        myCall.enqueue(new Callback<List<SimilarRecipesResponse>>() {
             @Override
             public void onResponse(Call<List<SimilarRecipesResponse>> call, Response<List<SimilarRecipesResponse>> response) {
-                if (!response.isSuccessful()){
-                    listener.didError(response.message());
+                if (response.isSuccessful()){
+                    // yêu cầu API thành công
+                    listener.fetch(response.body(), response.message());
                     return;
                 }
-                listener.didFetch(response.body(), response.message());
+                listener.err(response.message());
             }
-
             @Override
             public void onFailure(Call<List<SimilarRecipesResponse>> call, Throwable t) {
-                listener.didError(t.getMessage());
+                listener.err(t.getMessage());
             }
         });
     }
+    // Lắng nghe kết quả trả về từ API và một id
+    // để xác định các hướng dẫn nấu ăn
     public void getInstructions(InstructionsListener listener, int id){
-        CallInstructions callInstructions = retrofit.create(CallInstructions.class);
-        Call<List<InstructionsReponse>> call = callInstructions.callInstructions(id, context.getString(R.string.api_key));
-        call.enqueue(new Callback<List<InstructionsReponse>>() {
+        // Tạo ra một yêu cầu API đến Spoonacular API
+        CallInstructions callSteps = myRetrofit.create(CallInstructions.class);
+        Call<List<InstructionsReponse>> myCall = callSteps.callInstructions(id, context.getString(R.string.api_key));
+        // Thực hiện yêu cầu này bất đồng bộ
+        myCall.enqueue(new Callback<List<InstructionsReponse>>() {
             @Override
             public void onResponse(Call<List<InstructionsReponse>> call, Response<List<InstructionsReponse>> response) {
-                if(!response.isSuccessful()){
-                    listener.didError(response.message());
+                if(response.isSuccessful()){
+                    // yêu cầu API thành công
+                    listener.fetch((ArrayList<InstructionsReponse>) response.body(), response.message());
                     return;
                 }
-                listener.didFetch((ArrayList<InstructionsReponse>) response.body(), response.message());
+                listener.err(response.message());
             }
-
             @Override
             public void onFailure(Call<List<InstructionsReponse>> call, Throwable t) {
-                listener.didError(t.getMessage());
+                listener.err(t.getMessage());
             }
         });
     }
-
-    private interface CallRandomRecipes{
+    // Định nghĩa các yêu cầu API đến Spoonacular API
+    private interface CallRandoms{
         @GET("recipes/random")
         Call<RandomRecipeApiResponse> callRandomRecipe(
                 @Query("apiKey") String apiKey,
@@ -119,14 +138,14 @@ public class RequestManager {
                 @Query("tags") List<String> tags
         );
     }
-    private interface CallRecipeDetails{
+    private interface CallDetails{
         @GET("recipes/{id}/information")
         Call<RecipeDetailsResponse> callRecipeDetails(
                 @Path("id") int id,
                 @Query("apiKey") String apiKey
         );
     }
-    private interface CallSimilarRecipes{
+    private interface CallSimilars{
         @GET("recipes/{id}/similar")
         Call<List<SimilarRecipesResponse>> callSimilarRecipes(
                 @Path("id") int id,
@@ -141,5 +160,4 @@ public class RequestManager {
                 @Query("apiKey") String apiKey
         );
     }
-
 }

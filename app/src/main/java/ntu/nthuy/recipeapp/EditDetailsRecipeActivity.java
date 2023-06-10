@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,11 +24,16 @@ import ntu.nthuy.recipeapp.Model.ExtendedIngredient;
 import ntu.nthuy.recipeapp.Model.RecipeDetailsResponse;
 
 public class EditDetailsRecipeActivity extends AppCompatActivity {
+    // Tham chiếu đến đối tượng RecipeDetailsResponse cần chỉnh sửa
     private DatabaseReference recipeRef;
+    // Đối tượng RecipeDetailsResponse lưu trữ thông tin chi tiết của công thức nấu ăn cần chỉnh sửa
     private RecipeDetailsResponse recipeDetails;
+    // Các EditText sửa thông tin
     EditText titleEditText, imageEditText, sourceNameEditText, summaryEditText, noteEditText;
+    // Hiện nguyên liệu, bước hướng dẫn nấu ăn của công thức
     RecyclerView extendedIngredientsRecyclerView, instructionsRecyclerView;
-    Button saveButton;
+    // Một Button để lưu lại các thay đổi
+    Button saveClick;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +41,7 @@ public class EditDetailsRecipeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_details_recipe);
         findViews();
         // Lấy id của đối tượng RecipeDetailsResponse cần chỉnh sửa từ intent
-        String recipeId = getIntent().getStringExtra("id");
-        Toast.makeText(this, recipeId, Toast.LENGTH_SHORT).show();
+        String recipeId = getIntent().getStringExtra("recipeId");
 
         // Khởi tạo DatabaseReference để truy cập đến đối tượng RecipeDetailsResponse
         // tương ứng trên Firebase Realtime
@@ -73,17 +76,17 @@ public class EditDetailsRecipeActivity extends AppCompatActivity {
             }
         });
         // Thiết lập sự kiện click cho nút "Save"
-        saveButton.setOnClickListener(new View.OnClickListener() {
+        saveClick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Lấy giá trị mới từ các view trên layout
-                String title = ((EditText) findViewById(R.id.edt_edit_title)).getText().toString();
-                String image = ((EditText) findViewById(R.id.edt_edit_image)).getText().toString();
-                String sourceName = ((EditText) findViewById(R.id.edt_edit_source_name)).getText().toString();
+                String title = ((EditText) findViewById(R.id.edt_title)).getText().toString();
+                String image = ((EditText) findViewById(R.id.edt_image)).getText().toString();
+                String sourceName = ((EditText) findViewById(R.id.edt_source_name)).getText().toString();
                 ArrayList<ExtendedIngredient> extendedIngredients = ((IngredientsAdapter) extendedIngredientsRecyclerView.getAdapter()).getIngredient();
 //                ArrayList<InstructionsReponse> instructionsReponses = ((InstructionsAdapter) instructionsRecyclerView.getAdapter()).getInstructions();
-                String summary = ((EditText) findViewById(R.id.summary_edit_text)).getText().toString();
-                String note = ((EditText) findViewById(R.id.note_edit_text)).getText().toString();
+                String summary = ((EditText) findViewById(R.id.summary_edt_text)).getText().toString();
+                String note = ((EditText) findViewById(R.id.note_edt_text)).getText().toString();
 
                 // Cập nhật đối tượng RecipeDetailsResponse trên Firebase Realtime
                 recipeDetails.setTitle(title);
@@ -101,14 +104,15 @@ public class EditDetailsRecipeActivity extends AppCompatActivity {
         });
     }
 
+    // Tìm và ánh xạ các thành phần giao diện người dùng trên màn hình
     private void findViews() {
-        titleEditText = findViewById(R.id.edt_edit_title);
-        imageEditText = findViewById(R.id.edt_edit_image);
-        sourceNameEditText = findViewById(R.id.edt_edit_source_name);
-        extendedIngredientsRecyclerView = findViewById(R.id.recycler_view_Edit_extended_ingredients);
-        instructionsRecyclerView = findViewById(R.id.recycler_view_Edit_instructions);
-        summaryEditText = findViewById(R.id.summary_edit_text);
-        noteEditText = findViewById(R.id.note_edit_text);
-        saveButton = findViewById(R.id.save_button);
+        titleEditText = findViewById(R.id.edt_title);
+        imageEditText = findViewById(R.id.edt_image);
+        sourceNameEditText = findViewById(R.id.edt_source_name);
+        extendedIngredientsRecyclerView = findViewById(R.id.recycler_view_extended_ingredients);
+        instructionsRecyclerView = findViewById(R.id.recycler_view_instructions);
+        summaryEditText = findViewById(R.id.summary_edt_text);
+        noteEditText = findViewById(R.id.note_edt_text);
+        saveClick = findViewById(R.id.save_button);
     }
 }
